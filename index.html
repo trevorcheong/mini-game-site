@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=7">
+<link rel="stylesheet" href="assets/style.css?v=8">
 </head>
 <body>
 
@@ -52,10 +52,10 @@
   <span id="demoNote"></span>
 </footer>
 
-<script src="games.config.js?v=7"></script>
-<script src="assets/token.js?v=7"></script>
-<script src="assets/voucher.js?v=7"></script>
-<script src="assets/common.js?v=7"></script>
+<script src="games.config.js?v=8"></script>
+<script src="assets/token.js?v=8"></script>
+<script src="assets/voucher.js?v=8"></script>
+<script src="assets/common.js?v=8"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal } = UI;
@@ -69,7 +69,7 @@
 
   // 保留第三方带来的 ?token= 参数
   const qs = new URLSearchParams(location.search);
-  const playUrl = (id) => { const p = new URLSearchParams(qs); p.set("game", id); return "play.html?" + p.toString(); };
+  const playUrl = (id) => { const p = new URLSearchParams(qs); p.set("game", id); p.set("v", "8"); return "play.html?" + p.toString(); };
 
   function tagHTML(t) {
     if (!t) return "";
