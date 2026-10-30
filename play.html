@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/style.css?v=11">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
@@ -67,7 +67,7 @@
     var ua = navigator.userAgent;
     var iOS = /iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     var safari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
-    if (iOS && safari) document.documentElement.classList.add("ios-safari");
+    if (iOS) document.documentElement.classList.add("ios-safari");
 
     // 用手机实际看得到的高度来排版（避免网页比屏幕高、底部被切掉）
     var root = document.documentElement;
@@ -132,10 +132,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=10"></script>
-<script src="assets/token.js?v=10"></script>
-<script src="assets/voucher.js?v=10"></script>
-<script src="assets/common.js?v=10"></script>
+<script src="games.config.js?v=11"></script>
+<script src="assets/token.js?v=11"></script>
+<script src="assets/voucher.js?v=11"></script>
+<script src="assets/common.js?v=11"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -192,7 +192,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=10";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=11";
     frame.classList.add("on");
     playing = true;
   }
@@ -293,6 +293,31 @@
   });
 
   if (hasTicket()) launch();
+
+  /* ---------- 检测画面：网址加 &debug=1 ---------- */
+  if (qs.get("debug") === "1") {
+    const box = document.createElement("pre");
+    box.style.cssText = "position:fixed;left:6px;right:6px;top:70px;z-index:999;margin:0;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.85);color:#7CFC9A;font:11px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;pointer-events:none";
+    document.body.appendChild(box);
+    const R = (el) => { if (!el) return "-"; const r = el.getBoundingClientRect(); return Math.round(r.top) + "→" + Math.round(r.bottom) + " (h" + Math.round(r.height) + ")"; };
+    const show = () => {
+      const de = document.documentElement, vv = window.visualViewport;
+      let inner = "-";
+      try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
+      box.textContent = [
+        "build v11",
+        "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
+        "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
+        "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),
+        "screen: " + screen.width + "x" + screen.height + "   dpr " + devicePixelRatio,
+        "body: " + R(document.body) + "  pad-b " + getComputedStyle(document.body).paddingBottom,
+        "stage: " + R(document.querySelector(".stage")),
+        "frame: " + R(frame) + "   inside: " + inner,
+        "UA: " + navigator.userAgent
+      ].join("\n");
+    };
+    show(); setInterval(show, 1000);
+  }
 })();
 </script>
 </body>
