@@ -21,7 +21,7 @@ window.GAMES = [
     title: "Chicken Cross",
     file: "games/chicken-cross-game.html",
     thumb: "thumbs/chicken-cross.jpg",
-    cost: 5,
+    cost: 1,
     tag: "HOT",
     color: "#f59e0b",
     howTo: [
@@ -36,7 +36,7 @@ window.GAMES = [
     title: "Croco Road",
     file: "games/croc-road.html",
     thumb: "thumbs/croc-road.jpg",
-    cost: 5,
+    cost: 1,
     tag: "",
     color: "#22c55e",
     howTo: [
@@ -51,7 +51,7 @@ window.GAMES = [
     title: "Catch the Fortune",
     file: "games/fortune-catch.html",
     thumb: "thumbs/fortune-catch.jpg",
-    cost: 8,
+    cost: 1,
     tag: "NEW",
     color: "#ef4444",
     howTo: [
@@ -66,7 +66,7 @@ window.GAMES = [
     title: "Gold Rush Mines",
     file: "games/gold-rush-mines.html",
     thumb: "thumbs/gold-rush-mines.jpg",
-    cost: 5,
+    cost: 1,
     tag: "",
     color: "#eab308",
     howTo: [
@@ -81,7 +81,7 @@ window.GAMES = [
     title: "Jungle Whack",
     file: "games/jungle-whack.html",
     thumb: "thumbs/jungle-whack.jpg",
-    cost: 8,
+    cost: 1,
     tag: "",
     color: "#84cc16",
     howTo: [
@@ -96,7 +96,7 @@ window.GAMES = [
     title: "Neon Rocket",
     file: "games/neon-rocket-standalone.html",
     thumb: "thumbs/neon-rocket.jpg",
-    cost: 10,
+    cost: 1,
     tag: "18+",
     color: "#d946ef",
     howTo: [
