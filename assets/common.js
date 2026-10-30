@@ -18,8 +18,30 @@
   }
 
   /** 顶部 TOKEN 显示 */
+  /** 玩家名字（放在 TOKEN 左边） */
+  function mountPlayer(pill) {
+    if (!pill || document.getElementById("playerChip")) return;
+    const box = document.createElement("div");
+    box.className = "acct";
+    pill.parentNode.insertBefore(box, pill);
+    const chip = document.createElement("button");
+    chip.type = "button"; chip.id = "playerChip"; chip.className = "player-chip";
+    box.appendChild(chip); box.appendChild(pill);
+    const render = () => {
+      const name = TokenService.playerName();
+      chip.title = name;
+      chip.setAttribute("aria-label", "Player: " + name);
+      chip.innerHTML = `<span class="p-ava">${esc((name.trim()[0] || "G").toUpperCase())}</span>
+        <span class="p-txt"><small>PLAYER</small><b>${esc(name)}</b></span>`;
+    };
+    render();
+    TokenService.onChange(render);
+    chip.onclick = () => toast("Player: " + TokenService.playerName());
+  }
+
   function bindTokenPill() {
     const pill = document.getElementById("tokenPill");
+    mountPlayer(pill);
     const num = document.getElementById("tokenNum");
     let last = null;
     TokenService.onChange((b) => {

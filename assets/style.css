@@ -306,3 +306,21 @@ img{display:block;max-width:100%}
 .pill-delta.minus{color:#ff6b84}
 .pill-delta.plus{color:#6ff0ad}
 @keyframes deltaFloat{0%{opacity:0;transform:translateY(-8px) scale(.8)}15%{opacity:1;transform:translateY(0) scale(1.15)}70%{opacity:1}100%{opacity:0;transform:translateY(18px)}}
+
+/* 玩家名字（TOKEN 左边） */
+.acct{display:flex;align-items:center;gap:8px;min-width:0}
+.player-chip{display:flex;align-items:center;gap:8px;min-width:0;height:44px;padding:4px 12px 4px 4px;border-radius:999px;
+  background:rgba(255,255,255,.05);border:1px solid var(--line-2);text-align:left}
+.player-chip:hover{background:rgba(255,255,255,.09)}
+.p-ava{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,var(--accent),#c04bff);box-shadow:0 4px 12px -4px rgba(124,92,255,.8)}
+.p-txt{display:flex;flex-direction:column;line-height:1.1;min-width:0}
+.p-txt small{font-size:9.5px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+.p-txt b{font-size:14px;font-weight:800;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:520px){
+  .player-chip{height:40px;padding-right:10px}
+  .p-ava{width:30px;height:30px;font-size:13px}
+  .p-txt small{display:none}
+  .p-txt b{font-size:13px;max-width:72px}
+}
+@media(max-width:430px){ .brand-name{display:none} }

@@ -11,7 +11,8 @@
 (function () {
   const CONFIG = {
     API_BASE: "",          // 例: "https://api.yoursite.com/v1"  留空 = 演示模式
-    DEMO_START_BALANCE: 100
+    DEMO_START_BALANCE: 100,
+    DEMO_NAME: "Guest"     // 没有玩家名字时显示
   };
 
   const LS_BAL = "mgs.demoBalance";
@@ -23,6 +24,13 @@
   const urlToken = new URLSearchParams(location.search).get("token");
   if (urlToken) safe(() => sessionStorage.setItem(SS_TOKEN, urlToken));
   const playerToken = () => urlToken || safe(() => sessionStorage.getItem(SS_TOKEN), null);
+
+  // 玩家名字：第三方跳转时带 ?name=Trevor（或由 API /balance 返回 name）
+  const SS_NAME = "mgs.playerName";
+  const urlName = new URLSearchParams(location.search).get("name");
+  if (urlName) safe(() => sessionStorage.setItem(SS_NAME, urlName.slice(0, 40)));
+  let apiName = null;
+  const playerName = () => apiName || urlName || safe(() => sessionStorage.getItem(SS_NAME), null) || CONFIG.DEMO_NAME;
 
   let demoMemory = CONFIG.DEMO_START_BALANCE;
   const demoGet = () => {
@@ -49,10 +57,16 @@
 
   window.TokenService = {
     isDemo: !CONFIG.API_BASE,
+    playerName,
     onChange(fn) { listeners.add(fn); },
 
     async getBalance() {
-      const b = CONFIG.API_BASE ? (await api("/balance")).balance : demoGet();
+      let b;
+      if (CONFIG.API_BASE) {
+        const r = await api("/balance");
+        b = r.balance;
+        if (r.name) { apiName = String(r.name).slice(0, 40); safe(() => sessionStorage.setItem(SS_NAME, apiName)); }
+      } else b = demoGet();
       emit(b);
       return b;
     },
