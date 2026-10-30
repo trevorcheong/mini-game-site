@@ -122,7 +122,7 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   @media (prefers-reduced-motion: reduce){ .btn,.hero,.rays,.card{animation:none} }
 </style>
-<script src="mgs-bridge.js"></script>
+<script src="mgs-bridge.js?v=15"></script>
 <style>/* MGS: mini game site */
 
 </style>
@@ -948,6 +948,8 @@ resize(); requestAnimationFrame(loop);
 
 /* MGS: skip in-game start screen */
 $('startScreen').classList.add('hidden'); setTimeout(startGame, 300);
+/* MGS: shrink result cards to fit short screens (hero art sticks out ~92px above the card) */
+(function(){ function fit(){ document.querySelectorAll('.overlay .card').forEach(function(c){ var ov=c.closest('.overlay'); if(!ov||ov.classList.contains('hidden')) return; c.style.scale='1'; c.style.translate='0 0'; var r=c.getBoundingClientRect(); var top=r.top, bot=r.bottom; c.querySelectorAll('.hero').forEach(function(h){ var hr=h.getBoundingClientRect(); if(hr.height) top=Math.min(top,hr.top); }); var H=bot-top; var s=Math.max(.5,Math.min(1,(innerHeight-20)/H,(innerWidth-20)/r.width)); var cy=(r.top+r.bottom)/2; var nt=cy-(cy-top)*s, nb=cy+(bot-cy)*s; var dy=innerHeight/2-(nt+nb)/2; c.style.scale=String(s); c.style.translate='0 '+Math.round(dy)+'px'; }); } addEventListener('resize',fit); if(window.ResizeObserver){ var ro=new ResizeObserver(fit); document.querySelectorAll('.overlay .card').forEach(function(c){ro.observe(c);}); } new MutationObserver(fit).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']}); fit(); })();
 </script>
 
 </body>

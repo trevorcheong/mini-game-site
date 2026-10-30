@@ -6,11 +6,47 @@
      MGS.gameOver()                                                整局输了（没命/没机会了）
      btn.onclick = MGS.paid(restartFn)                             这个按钮要先扣 TOKEN 才执行
    游戏单独打开（不在网站里）时：win/gameOver 不做事，paid 直接执行。
+
+   声音：浏览器要求玩家在游戏里点一下才可以播放。这里会记录游戏建立的所有
+   AudioContext，玩家第一次点击/触碰时把它们全部启动（iPhone 静音键开着也尽量播放）。
+   这个 script 要放在游戏自己的 script 之前。
    ========================================================= */
 (function () {
   var embedded = window.parent !== window;
   var pending = null, seq = 0;
 
+  /* ---------- 声音解锁 ---------- */
+  var contexts = [];
+  ["AudioContext", "webkitAudioContext"].forEach(function (name) {
+    var Orig = window[name];
+    if (!Orig || Orig.__mgs) return;
+    var Wrapped = function () {
+      var ctx = new (Function.prototype.bind.apply(Orig, [null].concat([].slice.call(arguments))))();
+      contexts.push(ctx);
+      return ctx;
+    };
+    Wrapped.prototype = Orig.prototype;
+    Wrapped.__mgs = true;
+    try { Object.setPrototypeOf(Wrapped, Orig); } catch (e) {}
+    window[name] = Wrapped;
+  });
+  function wakeAudio() {
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+    contexts.forEach(function (ctx) {
+      if (ctx.state !== "running" && ctx.state !== "closed") {
+        try {
+          ctx.resume();
+          var src = ctx.createBufferSource(); src.buffer = ctx.createBuffer(1, 1, 22050);
+          src.connect(ctx.destination); src.start(0);
+        } catch (e) {}
+      }
+    });
+  }
+  ["pointerdown", "pointerup", "touchstart", "touchend", "mousedown", "click", "keydown"].forEach(function (ev) {
+    window.addEventListener(ev, wakeAudio, { capture: true, passive: true });
+  });
+
+  /* ---------- 和外层网站沟通 ---------- */
   function post(msg) {
     if (!embedded) return;
     msg.mgs = 1;
