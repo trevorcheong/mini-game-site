@@ -314,6 +314,10 @@ img.rain{object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
 <style>/* MGS: mini game site */
 #newBtn{display:none!important}
 .ctrls{grid-template-columns:1fr!important}
+/* fit the whole game in short (phone) screens */
+.stage{display:flex;justify-content:center}
+.board{width:min(100%, max(230px, calc(100vh - 400px)));box-sizing:border-box}
+@media (max-height:760px){.app{padding-top:8px!important;padding-bottom:8px!important}}
 </style>
 </head>
 <body>

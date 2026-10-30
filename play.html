@@ -10,10 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=8">
+<link rel="stylesheet" href="assets/style.css?v=9">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
+  html.app-h,html.app-h body{height:var(--app-h)}
   body{display:flex;flex-direction:column}
   .topbar-in{max-width:none}
   .left{display:flex;align-items:center;gap:10px;min-width:0}
@@ -56,7 +57,7 @@
   .replay-q{padding:18px 18px 4px;font-size:16px;line-height:1.5;color:#d7d9e8}
   @media(max-width:420px){.gtitle{font-size:15px}}
   /* iPhone Safari：底部工具栏浮在网页上，游戏画面要留空间 */
-  @media(max-width:699px){.ios-safari .stage{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 62px)}}
+  @media(max-width:699px){.ios-safari .stage{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 66px)}}
 </style>
 <script>
   (function () {
@@ -64,6 +65,19 @@
     var iOS = /iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     var safari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
     if (iOS && safari) document.documentElement.classList.add("ios-safari");
+
+    // 用手机实际看得到的高度来排版（避免网页比屏幕高、底部被切掉）
+    var root = document.documentElement;
+    function fit() {
+      var h = window.innerHeight;
+      if (window.visualViewport && window.visualViewport.scale <= 1.01) h = Math.min(h, Math.round(window.visualViewport.height));
+      root.style.setProperty("--app-h", h + "px");
+      root.classList.add("app-h");
+    }
+    fit();
+    window.addEventListener("resize", fit);
+    window.addEventListener("orientationchange", function () { setTimeout(fit, 300); });
+    if (window.visualViewport) window.visualViewport.addEventListener("resize", fit);
   })();
 </script>
 </head>
@@ -115,10 +129,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=8"></script>
-<script src="assets/token.js?v=8"></script>
-<script src="assets/voucher.js?v=8"></script>
-<script src="assets/common.js?v=8"></script>
+<script src="games.config.js?v=9"></script>
+<script src="assets/token.js?v=9"></script>
+<script src="assets/voucher.js?v=9"></script>
+<script src="assets/common.js?v=9"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -175,7 +189,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=8";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=9";
     frame.classList.add("on");
     playing = true;
   }
