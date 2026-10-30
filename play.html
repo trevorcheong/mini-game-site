@@ -10,14 +10,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=11">
+<link rel="stylesheet" href="assets/style.css?v=12">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
   html.app-h,html.app-h body{height:var(--app-h)}
+  /* 关键：取消共用样式里的 min-height:100vh（iPhone 上会按整个屏幕算，把页面撑高） */
+  html,body{min-height:0!important}
   body{box-sizing:border-box}
-  /* iPhone Safari：底部浮动工具栏那一块整页都不用 */
-  @media(max-width:699px){html.ios-safari body{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 84px);background:#05060a}}
+  /* innerHeight 已经扣掉 Safari 工具栏，只留一点 iPhone 底部安全区 */
+  @media(max-width:699px){html.ios-safari body{padding-bottom:6px}}
   body{display:flex;flex-direction:column}
   .topbar-in{max-width:none}
   .left{display:flex;align-items:center;gap:10px;min-width:0}
@@ -132,10 +134,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=11"></script>
-<script src="assets/token.js?v=11"></script>
-<script src="assets/voucher.js?v=11"></script>
-<script src="assets/common.js?v=11"></script>
+<script src="games.config.js?v=12"></script>
+<script src="assets/token.js?v=12"></script>
+<script src="assets/voucher.js?v=12"></script>
+<script src="assets/common.js?v=12"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -192,7 +194,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=11";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=12";
     frame.classList.add("on");
     playing = true;
   }
@@ -305,7 +307,7 @@
       let inner = "-";
       try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
       box.textContent = [
-        "build v11",
+        "build v12",
         "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
         "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
         "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),
