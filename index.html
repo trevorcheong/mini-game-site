@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07080d">
+<title>Mini Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css?v=7">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="brand" href="index.html">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="#fff"><path d="M7 7h10a5 5 0 0 1 4.9 6l-.8 4a2.5 2.5 0 0 1-4.3 1.2L14.5 16h-5l-2.3 2.2A2.5 2.5 0 0 1 2.9 17l-.8-4A5 5 0 0 1 7 7zm1 3v1.5H6.5v1.5H8v1.5h1.5V13H11v-1.5H9.5V10H8zm8.5 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2-2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg></span>
+      <span class="brand-name">MINI GAMES<small>PLAY · WIN · CLAIM</small></span>
+    </a>
+    <div class="token-pill" id="tokenPill" title="Your token balance">
+      <span class="coin">T</span>
+      <span class="token-text"><b id="tokenNum">…</b><span>TOKEN</span></span>
+    </div>
+  </div>
+  <div id="vbar"></div>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <div>
+      <h1>Play games, <em>win vouchers.</em></h1>
+      <p>Pick a game, spend tokens to play, and claim your voucher back on your site.</p>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <h2>All Games<span id="count"></span></h2>
+    <label class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search games" autocomplete="off">
+    </label>
+  </div>
+
+  <section class="grid" id="grid" aria-live="polite"></section>
+</main>
+
+<footer class="foot">
+  Play responsibly · T&amp;Cs apply
+  <span id="demoNote"></span>
+</footer>
+
+<script src="games.config.js?v=7"></script>
+<script src="assets/token.js?v=7"></script>
+<script src="assets/voucher.js?v=7"></script>
+<script src="assets/common.js?v=7"></script>
+<script>
+(function () {
+  const { esc, ICON, thumbImg, openModal } = UI;
+  const games = window.GAMES || [];
+  const grid = document.getElementById("grid");
+  const q = document.getElementById("q");
+  let balance = 0;
+
+  // 回到大厅 = 结束上一局，清掉已付费记录
+  try { Object.keys(sessionStorage).filter((k) => k.startsWith("mgs.ticket.")).forEach((k) => sessionStorage.removeItem(k)); } catch (e) {}
+
+  // 保留第三方带来的 ?token= 参数
+  const qs = new URLSearchParams(location.search);
+  const playUrl = (id) => { const p = new URLSearchParams(qs); p.set("game", id); return "play.html?" + p.toString(); };
+
+  function tagHTML(t) {
+    if (!t) return "";
+    const cls = t === "NEW" ? "new" : /\+$/.test(t) ? "age" : "";
+    return `<span class="tag ${cls}">${esc(t)}</span>`;
+  }
+
+  function render() {
+    const term = q.value.trim().toLowerCase();
+    const list = games.filter((g) => !term || g.title.toLowerCase().includes(term));
+    document.getElementById("count").textContent = "· " + list.length;
+    if (!list.length) { grid.innerHTML = `<div class="empty">No games found.</div>`; return; }
+    grid.innerHTML = list.map((g) => `
+      <article class="card ${balance < g.cost ? "locked" : ""}" style="--glow:${esc(g.color || "#7c5cff")}99">
+        <a class="thumb" href="${playUrl(g.id)}" aria-label="Play ${esc(g.title)}">
+          ${tagHTML(g.tag)}
+          ${thumbImg(g)}
+          <span class="play-hint">${ICON.play}</span>
+        </a>
+        <div class="meta">
+          <h3>${esc(g.title)}</h3>
+          <div class="meta-row">
+            <span class="cost"><span class="coin sm">T</span>${g.cost} <small>TOKEN</small></span>
+            <button class="info-btn" data-info="${esc(g.id)}" aria-label="How to play ${esc(g.title)}">${ICON.info}</button>
+          </div>
+        </div>
+      </article>`).join("");
+  }
+
+  grid.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-info]");
+    if (!b) return;
+    const g = games.find((x) => x.id === b.dataset.info);
+    openModal(g, {
+      actions: [{ label: `${ICON.play.replace("<svg", '<svg width="16" height="16"')} Play · ${g.cost} TOKEN`, cls: "btn-gold", onClick: () => (location.href = playUrl(g.id)) }]
+    });
+  });
+  q.addEventListener("input", render);
+
+  TokenService.onChange((b) => { balance = b; render(); });
+  render();
+  UI.bindTokenPill();
+  UI.mountVoucherBar(document.getElementById("vbar"));
+
+  if (TokenService.isDemo) {
+    const n = document.getElementById("demoNote");
+    n.innerHTML = ` · Demo mode <button id="resetDemo">reset demo</button>`;
+    document.getElementById("resetDemo").onclick = () => { TokenService.resetDemo(); VoucherService.clearDemo(); UI.toast("Demo tokens & vouchers reset"); };
+  }
+})();
+</script>
+</body>
+</html>
