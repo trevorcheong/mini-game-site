@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="assets/style.css?v=7">
 <style>
   html,body{height:100%;overflow:hidden}
+  @supports (height:100dvh){html,body{height:100dvh}}
   body{display:flex;flex-direction:column}
   .topbar-in{max-width:none}
   .left{display:flex;align-items:center;gap:10px;min-width:0}
@@ -30,9 +31,10 @@
   }
   iframe{display:none;width:100%;height:100%;border:0;background:#000}
 
-  .gate{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+  .gate{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;padding:14px 16px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .gate-card{margin:auto}
   .gate-card{width:100%;max-width:400px;background:linear-gradient(180deg,rgba(23,26,40,.92),rgba(14,16,26,.96));border:1px solid var(--line-2);border-radius:22px;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
-  .gate-thumb{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--card-2)}
+  .gate-thumb{position:relative;aspect-ratio:16/8;max-height:30vh;width:100%;overflow:hidden;background:var(--card-2)}
   .gate-thumb img,.gate-thumb .ph{width:100%;height:100%;object-fit:cover}
   .gate-thumb::after{content:"";position:absolute;inset:auto 0 0 0;height:60%;background:linear-gradient(transparent,#151827)}
   .gate-body{padding:0 18px 18px;margin-top:-28px;position:relative;z-index:1}
@@ -41,10 +43,14 @@
   .stat{flex:1;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
   .stat small{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);font-weight:600}
   .stat b{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:18px;color:var(--gold);font-variant-numeric:tabular-nums}
-  .gate .howto{padding:12px 0 2px}
-  .gate .btn{width:100%;margin-top:14px;height:52px;font-size:16px}
-  .gate .err{color:#ff8ea1;font-size:13px;text-align:center;margin-top:10px;min-height:1em}
+  .gate .howto{padding:4px 0 0}
+  .how-label{margin-top:16px;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
+  .gate .btn{width:100%;margin-top:12px;height:54px;font-size:17px}
+  .gate .err{color:#ff8ea1;font-size:13px;text-align:center;margin-top:8px}
+  .gate .err:empty{display:none}
+  @media (max-height:700px){.gate-thumb{max-height:22vh}.gate-body h1{font-size:21px}.gate .howto li{padding:7px 0;font-size:13px}}
   iframe.on{display:block}
+  .frame-wrap:has(iframe:not(.on)){border-color:transparent;box-shadow:none}
   .replay-q{padding:18px 18px 4px;font-size:16px;line-height:1.5;color:#d7d9e8}
   @media(max-width:420px){.gtitle{font-size:15px}}
 </style>
@@ -88,9 +94,10 @@
           <div class="stat"><small>COST</small><b><span class="coin sm">T</span><span id="gateCost"></span></b></div>
           <div class="stat"><small>YOUR BALANCE</small><b><span class="coin sm">T</span><span id="gateBal">…</span></b></div>
         </div>
-        <ul class="howto" id="gateHow"></ul>
         <button class="btn btn-gold" id="startBtn">Start</button>
         <div class="err" id="gateErr"></div>
+        <div class="how-label">HOW TO PLAY</div>
+        <ul class="howto" id="gateHow"></ul>
       </div>
     </div>
   </div>
