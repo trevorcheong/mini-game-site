@@ -10,11 +10,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=9">
+<link rel="stylesheet" href="assets/style.css?v=10">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
   html.app-h,html.app-h body{height:var(--app-h)}
+  body{box-sizing:border-box}
+  /* iPhone Safari：底部浮动工具栏那一块整页都不用 */
+  @media(max-width:699px){html.ios-safari body{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 84px);background:#05060a}}
   body{display:flex;flex-direction:column}
   .topbar-in{max-width:none}
   .left{display:flex;align-items:center;gap:10px;min-width:0}
@@ -32,33 +35,33 @@
   }
   iframe{display:none;width:100%;height:100%;border:0;background:#000}
 
-  .gate{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;padding:14px 16px calc(24px + env(safe-area-inset-bottom, 0px));overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .gate{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px 16px;overflow:hidden}
   /* 手机：留出 Safari / Chrome 底部浮动工具栏的空间 */
-  @media (max-width:699px){.gate{padding-bottom:calc(96px + env(safe-area-inset-bottom, 0px))}}
-  .gate-card{margin:auto}
+  .gate-card{display:flex;flex-direction:column;max-height:100%;min-height:0}
   .gate-card{width:100%;max-width:400px;background:linear-gradient(180deg,rgba(23,26,40,.92),rgba(14,16,26,.96));border:1px solid var(--line-2);border-radius:22px;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
-  .gate-thumb{position:relative;aspect-ratio:16/8;max-height:30vh;width:100%;overflow:hidden;background:var(--card-2)}
+  .gate-thumb{position:relative;flex:0 1 auto;aspect-ratio:16/8;min-height:64px;max-height:28%;width:100%;overflow:hidden;background:var(--card-2)}
   .gate-thumb img,.gate-thumb .ph{width:100%;height:100%;object-fit:cover}
   .gate-thumb::after{content:"";position:absolute;inset:auto 0 0 0;height:60%;background:linear-gradient(transparent,#151827)}
-  .gate-body{padding:0 18px 18px;margin-top:-28px;position:relative;z-index:1}
+  .gate-body{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;padding:0 18px 16px;margin-top:-28px;position:relative;z-index:1}
+  .gate-body > *{flex:none}
   .gate-body h1{font-size:24px;font-weight:800}
   .gate-stats{display:flex;gap:10px;margin-top:12px}
   .stat{flex:1;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
   .stat small{display:block;font-size:10px;letter-spacing:.14em;color:var(--muted);font-weight:600}
   .stat b{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:18px;color:var(--gold);font-variant-numeric:tabular-nums}
-  .gate .howto{padding:4px 0 0}
+  .gate .howto{padding:4px 0 0;flex:0 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
   .how-label{margin-top:16px;font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--muted)}
   .gate .btn{width:100%;margin-top:12px;height:54px;font-size:17px}
   .gate .err{color:#ff8ea1;font-size:13px;text-align:center;margin-top:8px}
   .gate .err:empty{display:none}
-  @media (max-height:700px){.gate-thumb{max-height:22vh}.gate-body h1{font-size:21px}.gate .howto li{padding:7px 0;font-size:13px}}
+  @media (max-height:700px){.gate-body h1{font-size:21px}.gate .howto li{padding:7px 0;font-size:13px}.stat{padding:8px 12px}}
+  @media (max-height:560px){.gate-body h1{font-size:18px}.gate .btn{height:48px}.how-label{margin-top:10px}}
   iframe.on{display:block}
   .frame-wrap:has(iframe:not(.on)){border-color:transparent;box-shadow:none}
   .replay-q{padding:18px 18px 4px;font-size:16px;line-height:1.5;color:#d7d9e8}
   @media(max-width:420px){.gtitle{font-size:15px}}
   /* iPhone Safari：底部工具栏浮在网页上，游戏画面要留空间 */
-  @media(max-width:699px){.ios-safari .stage{padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 66px)}}
-</style>
+  </style>
 <script>
   (function () {
     var ua = navigator.userAgent;
@@ -129,10 +132,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=9"></script>
-<script src="assets/token.js?v=9"></script>
-<script src="assets/voucher.js?v=9"></script>
-<script src="assets/common.js?v=9"></script>
+<script src="games.config.js?v=10"></script>
+<script src="assets/token.js?v=10"></script>
+<script src="assets/voucher.js?v=10"></script>
+<script src="assets/common.js?v=10"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -189,7 +192,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=9";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=10";
     frame.classList.add("on");
     playing = true;
   }

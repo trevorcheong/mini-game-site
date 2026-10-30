@@ -316,8 +316,9 @@ img.rain{object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
 .ctrls{grid-template-columns:1fr!important}
 /* fit the whole game in short (phone) screens */
 .stage{display:flex;justify-content:center}
-.board{width:min(100%, max(230px, calc(100vh - 400px)));box-sizing:border-box}
+.board{width:min(100%, max(120px, calc(100vh - 400px)));box-sizing:border-box}
 @media (max-height:760px){.app{padding-top:8px!important;padding-bottom:8px!important}}
+@media (max-height:560px){.brand p{display:none}.brand h1{font-size:1.3rem}.top{gap:6px}.meter{padding:8px 12px;gap:4px 10px}.meter .amt{font-size:1.7rem}.stage{padding-top:6px!important;padding-bottom:10px!important}.btn{padding:10px 10px 9px!important;margin-bottom:4px}.board{padding:9px!important}}
 </style>
 </head>
 <body>
