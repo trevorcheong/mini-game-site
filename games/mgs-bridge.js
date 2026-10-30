@@ -5,6 +5,8 @@
      MGS.win({ amount: 0.5, code: "ABC-123", label: "RM0.50" })   玩家赢了 voucher
      MGS.gameOver()                                                整局输了（没命/没机会了）
      btn.onclick = MGS.paid(restartFn)                             这个按钮要先扣 TOKEN 才执行
+   领取：游戏里 id="claimBtn" 或有 data-mgs-claim 属性的按钮/链接，在网站里会被接管，
+   改由网站的领取接口处理（跳回合作方网站），不会再开新窗口到游戏自己写死的网址。
    游戏单独打开（不在网站里）时：win/gameOver 不做事，paid 直接执行。
 
    声音：浏览器要求玩家在游戏里点一下才可以播放。这里会记录游戏建立的所有
@@ -46,6 +48,18 @@
     window.addEventListener(ev, wakeAudio, { capture: true, passive: true });
   });
 
+  /* ---------- 领取：接管 CLAIM NOW ---------- */
+  var lastWin = null;
+  if (embedded) {
+    window.addEventListener("click", function (e) {
+      var el = e.target && e.target.closest && e.target.closest("#claimBtn, [data-mgs-claim]");
+      if (!el) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      post({ type: "claim", amount: lastWin && lastWin.amount, code: lastWin && lastWin.code, label: lastWin && lastWin.label });
+    }, true);
+  }
+
   /* ---------- 和外层网站沟通 ---------- */
   function post(msg) {
     if (!embedded) return;
@@ -65,6 +79,7 @@
     embedded: embedded,
     win: function (v) {
       v = v || {};
+      lastWin = { amount: v.amount, code: v.code, label: v.label };
       post({ type: "win", amount: v.amount, code: v.code, label: v.label });
     },
     gameOver: function () { post({ type: "over" }); },

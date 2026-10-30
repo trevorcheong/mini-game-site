@@ -166,29 +166,53 @@
     }));
   }
 
+  /** 领取一张 voucher：有领取网址就跳回合作方网站；没有就显示 code 让玩家复制 */
+  function claimVoucher(v) {
+    if (!v) return;
+    if (VoucherService.claim(v)) { toast("Taking you to claim " + v.label + "…"); return; }
+    openModal(
+      { title: "Claim " + v.label, icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
+      {
+        subtitle: esc(v.gameTitle || "Voucher"),
+        body: `<div class="claim-box">
+            <p>Your voucher is saved in <b>My Vouchers</b>. Use this code on the partner site to claim it.</p>
+            <div class="claim-code"><code>${esc(v.code || "—")}</code>
+              ${v.code ? `<button class="copy-btn" type="button" data-copy="${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}</div>
+          </div>`,
+        actions: [{ label: "Done", cls: "btn-gold", onClick: closeModal }]
+      }
+    );
+    bindCopy(document.getElementById("modal"));
+  }
+
   function openVoucherList() {
     const list = VoucherService.list();
     const fmt = VoucherService.fmt;
+    const canClaim = VoucherService.canClaim();
     const rows = list.length
       ? list.map((v) => `
         <li class="vrow">
           <div class="vrow-amt">${gameOf(v.gameId).thumb ? `<img src="${esc(gameOf(v.gameId).thumb)}" alt="">` : ""}<span>${esc(v.label)}</span></div>
           <div class="vrow-info"><b>${esc(v.gameTitle || "")}</b>${v.code ? `<code>${esc(v.code)}</code>` : ""}<span>${timeAgo(v.at)}</span></div>
-          ${v.code ? `<button class="copy-btn" type="button" data-copy="${esc(v.code)}" aria-label="Copy voucher code ${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}
+          <div class="vrow-act">
+            ${v.code ? `<button class="copy-btn sm" type="button" data-copy="${esc(v.code)}" aria-label="Copy voucher code ${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}
+            ${v.claimed
+              ? `<span class="claimed-tag">CLAIMED</span>`
+              : canClaim ? `<button class="claim-btn" type="button" data-claim="${esc(v.id)}">CLAIM</button>` : ""}
+          </div>
         </li>`).join("")
       : `<li class="vempty">No vouchers yet. Win one in any game!</li>`;
-    const claim = VoucherService.claimUrl();
     openModal(
       { title: "My Vouchers", icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
       {
         subtitle: `${list.length} voucher${list.length === 1 ? "" : "s"} · Total <b class="gold">${fmt(VoucherService.total())}</b>`,
         body: `<ul class="vlist">${rows}</ul>`,
-        actions: claim
-          ? [{ label: "Claim on partner site", cls: "btn-gold", onClick: () => window.open(claim, "_blank", "noopener") }]
-          : [{ label: "Close", onClick: closeModal }]
+        actions: [{ label: "Close", onClick: closeModal }]
       }
     );
-    bindCopy(document.getElementById("modal"));
+    const m = document.getElementById("modal");
+    bindCopy(m);
+    m.querySelectorAll("[data-claim]").forEach((b) => (b.onclick = () => claimVoucher(VoucherService.get(b.dataset.claim))));
   }
 
   /** 在 el 里放 My Vouchers 栏。hideEmpty=true 时没有 voucher 就隐藏 */
@@ -231,5 +255,5 @@
   }
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-  window.UI = { esc, initials, ICON, thumbImg, bindTokenPill, toast, openModal, closeModal, mountVoucherBar, openVoucherList, copyText, notify };
+  window.UI = { esc, initials, ICON, thumbImg, bindTokenPill, toast, openModal, closeModal, mountVoucherBar, openVoucherList, copyText, notify, claimVoucher };
 })();

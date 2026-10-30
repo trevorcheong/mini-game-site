@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=15">
+<link rel="stylesheet" href="assets/style.css?v=16">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
@@ -135,10 +135,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=15"></script>
-<script src="assets/token.js?v=15"></script>
-<script src="assets/voucher.js?v=15"></script>
-<script src="assets/common.js?v=15"></script>
+<script src="games.config.js?v=16"></script>
+<script src="assets/token.js?v=16"></script>
+<script src="assets/voucher.js?v=16"></script>
+<script src="assets/common.js?v=16"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -195,7 +195,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=15";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=16";
     frame.classList.add("on");
     playing = true;
   }
@@ -260,14 +260,20 @@
   UI.mountVoucherBar(document.getElementById("vbar"), { hideEmpty: true });
   const toGame = (msg) => { try { frame.contentWindow.postMessage(Object.assign({ mgs: 1 }, msg), "*"); } catch (e) {} };
 
+  let lastVoucher = null;                     // 这一页最近赢到的 voucher
   window.addEventListener("message", (e) => {
     const d = e.data;
     if (!d || d.mgs !== 1 || e.source !== frame.contentWindow) return;
 
     if (d.type === "win") {
-      VoucherService.add({ gameId: g.id, gameTitle: g.title, amount: d.amount, code: d.code, label: d.label });
+      lastVoucher = VoucherService.add({ gameId: g.id, gameTitle: g.title, amount: d.amount, code: d.code, label: d.label });
       setTicket(false); playing = false;      // 这一局结束
       UI.notify({ kind: "win", title: `You won ${d.label || VoucherService.fmt(d.amount)}!`, sub: "Voucher saved to My Vouchers" });
+    }
+
+    if (d.type === "claim") {                // 游戏里按 CLAIM NOW → 领取接口
+      const v = (d.code && VoucherService.list().find((x) => x.code === d.code && x.gameId === g.id)) || lastVoucher;
+      UI.claimVoucher(v);
     }
 
     if (d.type === "over") { setTicket(false); playing = false; }  // 输了，这一局结束
@@ -308,7 +314,7 @@
       let inner = "-";
       try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
       box.textContent = [
-        "build v15",
+        "build v16",
         "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
         "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
         "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),

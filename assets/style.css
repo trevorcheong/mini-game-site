@@ -324,3 +324,16 @@ img{display:block;max-width:100%}
   .p-txt b{font-size:13px;max-width:72px}
 }
 @media(max-width:430px){ .brand-name{display:none} }
+
+/* 领取 */
+.vrow-act{display:flex;flex-direction:column;align-items:stretch;gap:6px;flex:none}
+.vrow-act .copy-btn.sm{margin:0}
+.claim-btn{height:30px;padding:0 12px;border-radius:8px;font-size:11px;font-weight:900;letter-spacing:.08em;color:#fff;
+  background:linear-gradient(180deg,#8b6dff,#6a45ff);box-shadow:0 4px 14px -4px rgba(124,92,255,.8)}
+.claim-btn:active{transform:scale(.95)}
+.claimed-tag{height:30px;display:grid;place-items:center;padding:0 10px;border-radius:8px;font-size:10px;font-weight:900;letter-spacing:.1em;
+  color:#6ff0ad;background:rgba(62,224,143,.1);border:1px solid rgba(62,224,143,.35)}
+.claim-box{padding:14px 18px 2px;color:#d7d9e8;font-size:14.5px;line-height:1.55}
+.claim-code{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 10px 10px 14px;border-radius:12px;
+  background:rgba(255,200,61,.08);border:1px dashed rgba(255,200,61,.45)}
+.claim-code code{font:700 16px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--gold);overflow:hidden;text-overflow:ellipsis}

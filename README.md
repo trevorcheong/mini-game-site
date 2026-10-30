@@ -42,9 +42,35 @@ thumbs/           游戏缩略图（建议 1:1 正方形，至少 512x512）
 ```js
 MGS.win({ amount: 0.5, code: "ABC-123", label: "RM0.50" });  // 赢到 voucher 时
 MGS.gameOver();                                             // 整局输了时
+// 游戏里 id="claimBtn"（或加 data-mgs-claim）的按钮会自动改走网站的领取接口
 retryBtn.onclick = MGS.paid(restartGame);                   // 输后/赢后重玩都要扣 TOKEN
 ```
 原版游戏备份在 `games_original_backup/`。
+
+## 领取接口（CLAIM）
+玩家按游戏里的 **CLAIM NOW**，或 My Vouchers 里的 **CLAIM**，网站会在**同一个窗口**跳回合作方网站：
+
+```
+{claim_url}?code=CROC-7KQ2PX&amount=0.70&currency=MYR&voucher_id=mvuukmf45h3c&game=croc-road&token=<玩家token>
+```
+
+| 参数 | 说明 |
+|---|---|
+| code | voucher code |
+| amount | 金额（2 位小数） |
+| currency | 货币，默认 MYR |
+| voucher_id | 本网站的 voucher 编号（合作方用来防止重复领取） |
+| game | 哪个游戏赢的 |
+| token | 合作方带过来的玩家 token（识别是哪个玩家） |
+
+领取网址来源（优先顺序）：
+1. 合作方跳过来时带在网址：`index.html?token=XXX&name=Trevor&claim_url=https://partner.com/claim`
+2. `assets/voucher.js` 里的 `CLAIM_URL` 默认值
+
+两个都没有时，CLAIM 会显示 voucher code 让玩家复制。游戏内原本写死的领取网址已不再使用。
+
+> 正式上线前：合作方收到领取请求后，应该向本网站后端确认这张 voucher 真的存在、还没被领过
+>（`POST {API_BASE}/vouchers/{voucher_id}/claim`），不能只相信网址上的参数。
 
 ## Voucher 存放
 `assets/voucher.js` —— 演示模式存在浏览器；填 `CLAIM_URL` 后 My Vouchers 弹窗会出现 “Claim on partner site” 按钮。

@@ -58,6 +58,7 @@
   window.TokenService = {
     isDemo: !CONFIG.API_BASE,
     playerName,
+    playerToken,
     onChange(fn) { listeners.add(fn); },
 
     async getBalance() {
