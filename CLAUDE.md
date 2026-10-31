@@ -49,6 +49,7 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
+- 7 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal.
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
   A `sessionStorage` ticket stops a refresh from charging twice. Going back to the lobby clears tickets.
@@ -83,6 +84,8 @@ Do not treat the site as production-safe until these exist.
    - wrap replay buttons with `MGS.paid`
    - give the claim button `id="claimBtn"`
    - add a BOOT line that skips the in-game start screen
+     (if the game's code is wrapped in an IIFE, put the start call inside it with a replacement instead —
+     see the Golden Goal entry)
 3. Run `python3 tools/patch_games.py`.
 4. Add the game to `games.config.js`.
 5. Test win, loss, paid replay, and claim (see Testing).
@@ -108,6 +111,8 @@ Do not treat the site as production-safe until these exist.
   on play.html.
 - Debug overlay: `play.html?game=<id>&debug=1` shows heights, frame position and UA.
   Ask the owner for a screenshot of it when a phone layout problem can't be reproduced.
+- Keep this file current: when a change alters the rules, structure, game list or workflow above,
+  update CLAUDE.md in the same commit.
 - After every change:
   1. Commit and push to `main`.
   2. Copy the same changed files to `E:\CLAUDE\MINI GAME SIDE` when that computer is connected.
@@ -126,3 +131,5 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
   - Gold Rush: `found=4;over=false;cashOut()`
   - Jungle: `showWin()`, then click `.box`
   - Neon: `openReward(true,1)`
+  - Golden Goal: its code is wrapped in an IIFE, so the patch exposes `window.MGS_TEST`:
+    `MGS_TEST.game.cents=70; MGS_TEST.endRound()` (cents 0 → loss screen)

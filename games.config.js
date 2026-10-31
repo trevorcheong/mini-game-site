@@ -105,5 +105,20 @@ window.GAMES = [
       "Cash out at the target multiplier (2.00×) or higher to win.",
       "The higher you cash out, the bigger your reward. 18+ only."
     ]
+  },
+  {
+    id: "golden-goal",
+    title: "Golden Goal",
+    file: "games/golden-goal.html",
+    thumb: "thumbs/golden-goal.jpg",
+    cost: 1,
+    tag: "NEW",
+    color: "#ffc93c",
+    howTo: [
+      "Tap a spot in the goal to shoot — corners are hardest to save.",
+      "Every goal adds RM0.10 to your voucher, up to RM2.00.",
+      "The keeper gets sharper as your voucher grows.",
+      "The round ends after 3 missed or saved shots."
+    ]
   }
 ];

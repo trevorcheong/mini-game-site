@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=16"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=17"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -80,6 +80,21 @@ patch('neon-rocket-standalone.html', '', [
  ("const saved = store.get();\nif(saved && saved.expiresAt > Date.now()){ showTicket(saved); }\nelse { if(saved) store.clear(); show('intro'); }",
   "store.clear(); show('intro'); // MGS: every paid game starts fresh"),
  ("$('#replayBtn').addEventListener('click', () => { store.clear(); newGame(); });", "$('#replayBtn').addEventListener('click', MGS.paid(() => { store.clear(); newGame(); }));"),
+])
+
+# 7 Golden Goal (penalty kicks; all code lives inside one IIFE, so hooks go inside it)
+patch('golden-goal.html', '', [
+ ('  $("vCode").textContent = code;\n',
+  '  $("vCode").textContent = code;\n  MGS.win({ amount: game.cents / 100, code: code, label: "RM" + fmt(game.cents) });\n'),
+ ('  if (game.cents <= 0) { $("loseScreen").hidden = false;',
+  '  if (game.cents <= 0) { MGS.gameOver(); $("loseScreen").hidden = false;'),
+ ('$("againBtn").addEventListener("click", start);', '$("againBtn").addEventListener("click", MGS.paid(start));'),
+ ('$("retryBtn").addEventListener("click", start);', '$("retryBtn").addEventListener("click", MGS.paid(start));'),
+ # skip the in-game start screen (paid on the site already) + test hook
+ ('renderHud(false);\nloadAll.then(() => { fitStage(); requestAnimationFrame(loop); });',
+  'renderHud(false);\nloadAll.then(() => { fitStage(); requestAnimationFrame(loop); });\n'
+  '/* MGS: skip in-game start screen */\n$("startScreen").hidden = true; start();\n'
+  'window.MGS_TEST = { game: game, endRound: endRound };'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----
