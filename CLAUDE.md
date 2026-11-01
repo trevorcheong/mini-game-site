@@ -56,6 +56,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   "Try again" while lives/chances remain inside the same game is free.
 - 8 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
   Pocket Pilot.
+- Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
+  (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
   A `sessionStorage` ticket stops a refresh from charging twice. Going back to the lobby clears tickets.

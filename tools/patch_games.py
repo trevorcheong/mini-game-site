@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=23"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=25"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -112,6 +112,12 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
  ('function draw(){\n  ctx.save();', 'function draw(){\n  ctx.fillStyle="#f3cfc4";ctx.fillRect(0,0,W,H);\n  ctx.save();'),
  ('  const s=Math.min(vw/W,vh/H);\n  const phone=vw<520;',
   '  W=Math.max(320,Math.min(900,Math.round(H*vw/vh)));stage.style.width=W+"px";stage.style.marginLeft=(-W/2)+"px";\n  const s=Math.min(vw/W,vh/H);\n  const phone=true;'),
+ # owner: difficulty rises little by little through the flight
+ #   gap 196 -> 132, spacing 250 -> 205, height swings +-90 -> +-185, speed 150 -> 235 (eased: gentle start, hard end)
+ ('  const obs=[];let gy=360;\n  for(let i=0;i<OBST;i++){\n    const t=i/OBST;\n    gy=Math.max(205,Math.min(470,gy+rnd(-150,150)));\n    obs.push({wx:560+i*SP,gy,gap:192-t*30,coin:(i+1)%CFG.GATES_PER_COIN===0,got:false});',
+  '  const obs=[];let gy=360,wx=560;\n  for(let i=0;i<OBST;i++){\n    const t=i/(OBST-1),e=Math.pow(t,1.35),sw=90+e*95;\n    gy=Math.max(195,Math.min(480,gy+rnd(-sw,sw)));\n    if(i)wx+=250-e*45;\n    obs.push({wx,gy,gap:196-e*64,coin:(i+1)%CFG.GATES_PER_COIN===0,got:false});'),
+ ('function speed(){return 150+Math.min(1,G.dist/(OBST*SP))*45}',
+  'function speed(){return 150+Math.pow(Math.min(1,G.dist/G.finishWx),1.2)*85}'),
  # owner: only 1 life
  ('  LIVES:3,', '  LIVES:1,'),
  ('<li><span>♥</span><span>3 lives. You restart where you crashed and keep your money</span></li>', '<li><span>♥</span><span>1 life. One crash ends the flight</span></li>'),

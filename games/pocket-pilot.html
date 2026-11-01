@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=23"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=25"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */
 #wrap{display:block}
@@ -263,11 +263,12 @@ const SP=232, PX=112;               // obstacle spacing, plane screen x
 let G;
 function rnd(a,b){return a+Math.random()*(b-a)}
 function newGame(){
-  const obs=[];let gy=360;
+  const obs=[];let gy=360,wx=560;
   for(let i=0;i<OBST;i++){
-    const t=i/OBST;
-    gy=Math.max(205,Math.min(470,gy+rnd(-150,150)));
-    obs.push({wx:560+i*SP,gy,gap:192-t*30,coin:(i+1)%CFG.GATES_PER_COIN===0,got:false});
+    const t=i/(OBST-1),e=Math.pow(t,1.35),sw=90+e*95;
+    gy=Math.max(195,Math.min(480,gy+rnd(-sw,sw)));
+    if(i)wx+=250-e*45;
+    obs.push({wx,gy,gap:196-e*64,coin:(i+1)%CFG.GATES_PER_COIN===0,got:false});
   }
   G={state:"ready",dist:0,y:330,vy:0,t:0,lastFlap:-9,lives:CFG.LIVES,money:0,coins:0,obs,
      finishWx:obs[OBST-1].wx+330,inv:0,crashT:0,shake:0,parts:[],floats:[],won:false,bgx:0};
@@ -324,7 +325,7 @@ function frame(now){
   const dt=Math.min(.033,(now-last)/1000);last=now;
   update(dt);draw();requestAnimationFrame(frame);
 }
-function speed(){return 150+Math.min(1,G.dist/(OBST*SP))*45}
+function speed(){return 150+Math.pow(Math.min(1,G.dist/G.finishWx),1.2)*85}
 
 function update(dt){
   G.t+=dt;G.bgx+=dt*(G.state==="play"?18:8);
