@@ -45,6 +45,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
     `MGS.onAudioUnlock(fn)`. In the Start click handler play.html synchronously calls
     `frame.contentWindow.MGS.unlockAudio()` (same origin), then after charging calls `MGS.startNow()`.
     Cross-origin (file://) falls back to postMessage `{mgs:1,type:"start"}`. `MGS.audioStates` helps tests.
+    While the game is still preloading, Start shows "Loading game…" and is disabled (a tap before the game
+    document exists can't start its sound); it re-enables on the frame's load (or after 15 s).
 - The bridge must load **before** the game's own scripts (patch_games.py inserts it in `<head>`).
 
 ## Game rules (agreed with the owner)
