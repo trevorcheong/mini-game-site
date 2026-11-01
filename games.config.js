@@ -120,5 +120,20 @@ window.GAMES = [
       "The keeper gets sharper as your voucher grows.",
       "The round ends after 3 missed or saved shots."
     ]
+  },
+  {
+    id: "pocket-pilot",
+    title: "Pocket Pilot",
+    file: "games/pocket-pilot.html",
+    thumb: "thumbs/pocket-pilot.jpg",
+    cost: 1,
+    tag: "NEW",
+    color: "#ff5d7a",
+    howTo: [
+      "Tap to fly through the gaps between the storms and towers.",
+      "Every coin gate adds RM0.10 to your voucher.",
+      "Reach the finish to win the top prize of RM2.00.",
+      "3 lives — you restart where you crashed and keep your money."
+    ]
   }
 ];

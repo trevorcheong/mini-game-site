@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=17"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=18"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -95,6 +95,19 @@ patch('golden-goal.html', '', [
   'renderHud(false);\nloadAll.then(() => { fitStage(); requestAnimationFrame(loop); });\n'
   '/* MGS: skip in-game start screen */\n$("startScreen").hidden = true; start();\n'
   'window.MGS_TEST = { game: game, endRound: endRound };'),
+])
+
+# 8 Pocket Pilot (tap-to-fly; images embedded on import; code inside an IIFE)
+patch('pocket-pilot.html', '/* keep the scaled 400x711 stage centred even when the frame is shorter than 711px */\n#wrap{display:block}\n#stage{position:absolute!important;left:50%;top:50%;margin:-355.5px 0 0 -200px}', [
+ ('  const amt=G.money,c=code(),win=amt>0;\n',
+  '  const amt=G.money,c=code(),win=amt>0;\n  if(win) MGS.win({amount:amt,code:c,label:"RM"+amt.toFixed(2)}); else MGS.gameOver();\n'),
+ ('$("againBtn").addEventListener("click",()=>{ensureAudio();replay()});',
+  '$("againBtn").addEventListener("click",MGS.paid(()=>{ensureAudio();replay()}));'),
+ # skip the in-game start screen (paid on the site already) + test hook
+ ('ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));',
+  'ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));\n'
+  '/* MGS: skip in-game start screen */\n$("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space");\n'
+  'window.MGS_TEST={get G(){return G},showResult:showResult,win:win,crash:crash};'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----

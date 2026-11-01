@@ -49,7 +49,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 7 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal.
+- 8 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot.
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
   A `sessionStorage` ticket stops a refresh from charging twice. Going back to the lobby clears tickets.
@@ -79,6 +80,9 @@ Do not treat the site as production-safe until these exist.
 ## Adding a game
 
 1. Put the original HTML in `games_original_backup/` and a 1:1 thumbnail in `thumbs/`.
+   Games often come from the owner's claude.ai artifacts (Artifact tool, `read`).
+   If an artifact loads separate files (e.g. `assets/*.png`), embed them as data URIs into one
+   self-contained HTML before saving it as the original (done for Pocket Pilot).
 2. In `tools/patch_games.py`, add a `patch(...)` entry. It must:
    - call `MGS.win` on win and `MGS.gameOver` on final loss
    - wrap replay buttons with `MGS.paid`
@@ -133,3 +137,7 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
   - Neon: `openReward(true,1)`
   - Golden Goal: its code is wrapped in an IIFE, so the patch exposes `window.MGS_TEST`:
     `MGS_TEST.game.cents=70; MGS_TEST.endRound()` (cents 0 → loss screen)
+  - Pocket Pilot: also an IIFE → `MGS_TEST.G.money=0.7; MGS_TEST.G.state='over'; MGS_TEST.showResult()`
+    (money 0 → loss), `MGS_TEST.win()` reaches the finish (RM2.00)
+- Check the game's own stage fits the frame on short phones: some games scale a fixed-size stage
+  and centre it with grid, which pushes it down when the frame is shorter (Pocket Pilot needed a CSS fix).
