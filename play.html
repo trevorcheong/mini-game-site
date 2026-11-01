@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=29">
+<link rel="stylesheet" href="assets/style.css?v=30">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
@@ -135,10 +135,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=29"></script>
-<script src="assets/token.js?v=29"></script>
-<script src="assets/voucher.js?v=29"></script>
-<script src="assets/common.js?v=29"></script>
+<script src="games.config.js?v=30"></script>
+<script src="assets/token.js?v=30"></script>
+<script src="assets/voucher.js?v=30"></script>
+<script src="assets/common.js?v=30"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -199,7 +199,7 @@
      开始卡片出现时就先在后台载入游戏（?mgs_wait=1，游戏先不开局）。
      玩家按 Start 的同一下点击里启动游戏的声音（iPhone 只准「点一下」播放声音），
      扣完 TOKEN 再叫游戏开局。 */
-  const gameUrl = (wait) => g.file + (g.file.includes("?") ? "&" : "?") + "v=29" + (wait ? "&mgs_wait=1" : "");
+  const gameUrl = (wait) => g.file + (g.file.includes("?") ? "&" : "?") + "v=30" + (wait ? "&mgs_wait=1" : "");
   let frameState = "none";            // none | loading | ready | started
   let startWhenReady = false;
   const frameMGS = () => { try { return frame.contentWindow.MGS || null; } catch (e) { return null; } };
@@ -368,7 +368,7 @@
       let inner = "-";
       try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
       box.textContent = [
-        "build v29",
+        "build v30",
         "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
         "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
         "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),
