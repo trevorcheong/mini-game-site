@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=28">
+<link rel="stylesheet" href="assets/style.css?v=29">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
@@ -135,10 +135,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=28"></script>
-<script src="assets/token.js?v=28"></script>
-<script src="assets/voucher.js?v=28"></script>
-<script src="assets/common.js?v=28"></script>
+<script src="games.config.js?v=29"></script>
+<script src="assets/token.js?v=29"></script>
+<script src="assets/voucher.js?v=29"></script>
+<script src="assets/common.js?v=29"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -199,7 +199,7 @@
      开始卡片出现时就先在后台载入游戏（?mgs_wait=1，游戏先不开局）。
      玩家按 Start 的同一下点击里启动游戏的声音（iPhone 只准「点一下」播放声音），
      扣完 TOKEN 再叫游戏开局。 */
-  const gameUrl = (wait) => g.file + (g.file.includes("?") ? "&" : "?") + "v=28" + (wait ? "&mgs_wait=1" : "");
+  const gameUrl = (wait) => g.file + (g.file.includes("?") ? "&" : "?") + "v=29" + (wait ? "&mgs_wait=1" : "");
   let frameState = "none";            // none | loading | ready | started
   let startWhenReady = false;
   const frameMGS = () => { try { return frame.contentWindow.MGS || null; } catch (e) { return null; } };
@@ -233,6 +233,7 @@
     $("againBtn").classList.remove("hidden");
     frame.classList.add("on");
     playing = true;
+    armBackTrap();
     if (frameState === "ready") startFrame();
     else if (frameState === "loading") startWhenReady = true;
     else { frameState = "started"; frame.src = gameUrl(false); }
@@ -261,9 +262,7 @@
   const lostNote = () => `<div class="leave-q"><span class="lq-ico">${WARN_ICO}</span>
     <p>This game isn't finished yet. If you leave now, the <b class="gold">${g.cost} TOKEN</b> you used <b>will not be returned</b>.</p></div>`;
 
-  $("back").addEventListener("click", (e) => {
-    if (!inProgress()) return;
-    e.preventDefault();
+  function askLeave() {
     openModal(g, {
       subtitle: "Game in progress",
       body: lostNote(),
@@ -272,6 +271,23 @@
         { label: "Keep playing", cls: "btn-gold", onClick: closeModal }
       ]
     });
+  }
+  $("back").addEventListener("click", (e) => {
+    if (!inProgress()) return;
+    e.preventDefault();
+    askLeave();
+  });
+  // 手机的返回键 / 往右滑返回：iPhone 不支援 beforeunload，所以开局时多放一层历史纪录，
+  // 按返回时先停在这一页并显示提醒
+  let backTrap = false;
+  function armBackTrap() {
+    if (backTrap) return;
+    try { history.pushState({ mgsGame: 1 }, ""); backTrap = true; } catch (e) {}
+  }
+  window.addEventListener("popstate", () => {
+    if (!backTrap) return;
+    if (inProgress()) { try { history.pushState({ mgsGame: 1 }, ""); } catch (e) {} askLeave(); }
+    else { backTrap = false; history.back(); }   // 游戏已结束：直接照常返回
   });
   // 浏览器返回键 / 关闭分页时也提醒
   window.addEventListener("beforeunload", (e) => {
@@ -352,7 +368,7 @@
       let inner = "-";
       try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
       box.textContent = [
-        "build v28",
+        "build v29",
         "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
         "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
         "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),

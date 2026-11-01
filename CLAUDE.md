@@ -62,6 +62,9 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
+  iOS Safari ignores `beforeunload`, so play.html also pushes a history entry when the game starts and
+  catches `popstate` (phone back button / swipe back) to show the same warning. Closing an in-app browser
+  (the X in WhatsApp/Facebook/etc.) can't be caught.
   A `sessionStorage` ticket stops a refresh from charging twice. Going back to the lobby clears tickets.
 - Games that saved vouchers in localStorage were changed so every paid game is fresh
   (Neon Rocket, Jungle Whack, Gold Rush chances).
