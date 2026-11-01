@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=25"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=26"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -128,6 +128,28 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
   'ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));\n'
   '/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(ensureAudio);\nMGS.boot(function(){ $("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space"); });\n'
   'window.MGS_TEST={get G(){return G},showResult:showResult,win:win,crash:crash};'),
+])
+
+# 9 Flash Memory: Simon-style memory, 10 levels, up to RM2.00. One wrong light ends the run:
+#   total>0 -> voucher (MGS.win), nothing won -> lose card (MGS.gameOver). Code is an IIFE -> test hook MGS_TEST.
+patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important}\nbody::after{display:none!important}\n#app{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}\n/* result cards are scaled to fit in JS (fitSheets) */', [
+  # claim goes through the site (bridge intercepts #claimBtn)
+  ('<a class="btn3d shine" id="btnClaim" href="#claim">', '<a class="btn3d shine" id="claimBtn" href="#claim">'),
+  ('const claim = $("#btnClaim");', 'const claim = $("#claimBtn");'),
+  ('$("#btnClaim").addEventListener("click"', '$("#claimBtn").addEventListener("click"'),
+  # report the result to the site
+  ('    $("#voucher").hidden = false;\n    pose($("#vMascot")',
+   '    $("#voucher").hidden = false;\n    MGS.win({ amount: total, code: $("#vCode").textContent, label: rm(total) });\n    pose($("#vMascot")'),
+  ('else { $("#lose").hidden = false; sfx.pop(); }', 'else { $("#lose").hidden = false; fitSheets(); sfx.pop(); MGS.gameOver(); }'),
+  # replay after a win or a loss costs TOKEN
+  ('$("#btnReplay").onclick = startGame;\n  $("#btnRetry").onclick = startGame;',
+   '$("#btnReplay").onclick = MGS.paid(startGame);\n  $("#btnRetry").onclick = MGS.paid(startGame);'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  # result cards: scale down to fit short phones so CLAIM / PLAY AGAIN stay visible
+  ('  function makeCode(){', '  function fitSheets(){ document.querySelectorAll(".overlay:not([hidden]) .sheet").forEach(function(el){ el.style.transform=""; var k=Math.min(1,(innerHeight-24)/el.offsetHeight,(innerWidth-24)/el.offsetWidth); if(k<1){ var dy=(innerHeight-el.offsetHeight*k)/2-el.offsetTop; el.style.transformOrigin="50% 0"; el.style.transform="translateY("+dy.toFixed(1)+"px) scale("+k.toFixed(3)+")"; } }); }\n  addEventListener("resize", fitSheets);\n  function makeCode(){'),
+  ('    pose($("#vMascot"), perfect ? "coin" : "thumbs");', '    fitSheets();\n    pose($("#vMascot"), perfect ? "coin" : "thumbs");'),
+  ('  window.__fm = {',
+   '  /* MGS: skip in-game start screen */\n  MGS.onAudioUnlock(function(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); ac.resume && ac.resume(); }catch(e){} });\n  MGS.boot(startGame);\n  window.MGS_TEST = { finish, fail, setTotal, get level(){return level}, set level(v){level=v} };\n  window.__fm = {'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----

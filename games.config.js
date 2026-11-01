@@ -135,5 +135,20 @@ window.GAMES = [
       "Reach the finish to win the top prize of RM2.00.",
       "One crash ends the flight, and you keep the money you collected."
     ]
+  },
+  {
+    id: "flash-memory",
+    title: "Flash Memory",
+    file: "games/flash-memory.html",
+    thumb: "thumbs/flash-memory.jpg",
+    cost: 1,
+    tag: "NEW",
+    color: "#9a7bff",
+    howTo: [
+      "Watch the lights flash, then tap them in the same order.",
+      "Each level adds one more light. There are 10 levels.",
+      "Every level you clear adds to your voucher, up to RM2.00.",
+      "One wrong light ends the game, and you keep what you won."
+    ]
   }
 ];

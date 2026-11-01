@@ -54,8 +54,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 8 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot.
+- 9 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -148,6 +148,9 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     `MGS_TEST.game.cents=70; MGS_TEST.endRound()` (cents 0 → loss screen)
   - Pocket Pilot: also an IIFE → `MGS_TEST.G.money=0.7; MGS_TEST.G.state='over'; MGS_TEST.showResult()`
     (money 0 → loss), `MGS_TEST.win()` reaches the finish (RM2.00)
+  - Flash Memory: also an IIFE → `__fm.seq` / `__fm.press(i)` play a level; a wrong press ends the run
+    (won > 0 → voucher, else loss card); `MGS_TEST.setTotal(2,false); MGS_TEST.level=10; MGS_TEST.finish(true)`
+    = perfect run. Its result cards scale to fit short frames (`fitSheets`).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
