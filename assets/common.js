@@ -169,7 +169,12 @@
   /** 领取一张 voucher：有领取网址就跳回合作方网站；没有就显示 code 让玩家复制 */
   function claimVoucher(v) {
     if (!v) return;
-    if (VoucherService.claim(v)) { toast("Taking you to claim " + v.label + "…"); return; }
+    // 会跳到合作方网站：游戏玩到一半时先提醒 TOKEN 不退还（play.html 提供 mgsConfirmLeave）
+    if (VoucherService.canClaim()) {
+      const go = () => { if (VoucherService.claim(v)) toast("Taking you to claim " + v.label + "…"); };
+      if (window.mgsConfirmLeave) window.mgsConfirmLeave(go); else go();
+      return;
+    }
     openModal(
       { title: "Claim " + v.label, icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
       {

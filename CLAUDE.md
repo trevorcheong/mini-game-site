@@ -64,7 +64,9 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
   iOS Safari ignores `beforeunload`, so play.html also pushes a history entry when the game starts and
   catches `popstate` (phone back button / swipe back) to show the same warning. Closing an in-app browser
-  (the X in WhatsApp/Facebook/etc.) can't be caught.
+  (the X in WhatsApp/Facebook/etc.) or the iPhone Safari tab can't be caught.
+  Every exit inside the site asks too: header ◀, header ↻, and CLAIM in My Vouchers
+  (`UI.claimVoucher` → `window.mgsConfirmLeave(go)` from play.html, which warns while a game is in progress).
   A `sessionStorage` ticket stops a refresh from charging twice. Going back to the lobby clears tickets.
 - Games that saved vouchers in localStorage were changed so every paid game is fresh
   (Neon Rocket, Jungle Whack, Gold Rush chances).
