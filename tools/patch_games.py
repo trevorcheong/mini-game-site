@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=30"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=31"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -132,7 +132,7 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
 
 # 9 Flash Memory: Simon-style memory, 10 levels, up to RM2.00. One wrong light ends the run:
 #   total>0 -> voucher (MGS.win), nothing won -> lose card (MGS.gameOver). Code is an IIFE -> test hook MGS_TEST.
-patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important}\nbody::after{display:none!important}\n#app{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}\n/* phones: character and light pads shrink with the frame height so nothing overlaps or gets cut off */\n.arena{--ms:clamp(56px,calc(var(--fh,100dvh) * .3 - 60px),265px)!important;padding-bottom:2%!important}\n.console{width:min(100%,340px,max(120px,calc(var(--fh,100dvh) - 236px - var(--ms) * .9)))!important;padding:min(14px,4cqw,3%)!important}\n.pads{gap:min(14px,4%)!important}\n@media (max-height:560px){.bubble{padding:5px 16px 7px}.bubble .big{font-size:20px}.bubble .sub{font-size:13px}#play{gap:6px}}\n/* result cards are scaled to fit in JS (fitSheets) */', [
+patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important}\nbody::after{display:none!important}\n#app{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}\n/* phones: character and light pads shrink with the frame height so nothing overlaps or gets cut off */\n.arena{padding-bottom:2%!important}\n.console{padding:min(14px,3%)!important}\n.pads{gap:min(14px,4%)!important}\n@media (max-height:560px){.bubble{padding:5px 16px 7px}.bubble .big{font-size:20px}.bubble .sub{font-size:13px}#play{gap:6px}}\n/* result cards are scaled to fit in JS (fitSheets) */', [
   # claim goes through the site (bridge intercepts #claimBtn)
   ('<a class="btn3d shine" id="btnClaim" href="#claim">', '<a class="btn3d shine" id="claimBtn" href="#claim">'),
   ('const claim = $("#btnClaim");', 'const claim = $("#claimBtn");'),
@@ -149,7 +149,7 @@ patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important
   ('  function makeCode(){', '  function fitSheets(){ document.querySelectorAll(".overlay:not([hidden]) .sheet").forEach(function(el){ el.style.transform=""; var k=Math.min(1,(innerHeight-24)/el.offsetHeight,(innerWidth-24)/el.offsetWidth); if(k<1){ var dy=(innerHeight-el.offsetHeight*k)/2-el.offsetTop; el.style.transformOrigin="50% 0"; el.style.transform="translateY("+dy.toFixed(1)+"px) scale("+k.toFixed(3)+")"; } }); }\n  addEventListener("resize", fitSheets);\n  function makeCode(){'),
   ('    pose($("#vMascot"), perfect ? "coin" : "thumbs");', '    fitSheets();\n    pose($("#vMascot"), perfect ? "coin" : "thumbs");'),
   ('  window.__fm = {',
-   '  /* MGS: real frame height for the layout (iPhone can size dvh oddly inside a frame) */\n  function setFH(){ document.documentElement.style.setProperty("--fh", innerHeight + "px"); }\n  setFH(); addEventListener("resize", setFH);\n  /* MGS: skip in-game start screen */\n  MGS.onAudioUnlock(function(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); ac.resume && ac.resume(); }catch(e){} });\n  MGS.boot(startGame);\n  window.MGS_TEST = { finish, fail, setTotal, get level(){return level}, set level(v){level=v} };\n  window.__fm = {'),
+   '  /* MGS: real frame height for the layout (iPhone can size dvh oddly inside a frame) */\n  /* character + light pads sized in px from the real frame height (iPhone Safari ignored the CSS version) */\n  function fitPlay(){ var H = innerHeight, ms = Math.max(56, Math.min(265, H * .3 - 60)), cw = Math.max(120, Math.min(innerWidth - 32, 340, H - 236 - ms * .9)); var ar = document.querySelector(".arena"), co = document.querySelector(".console"); ar.style.setProperty("--ms", ms + "px", "important"); co.style.setProperty("width", cw + "px", "important"); }\n  fitPlay(); addEventListener("resize", fitPlay); setTimeout(fitPlay, 300);\n  /* MGS: skip in-game start screen */\n  MGS.onAudioUnlock(function(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); ac.resume && ac.resume(); }catch(e){} });\n  MGS.boot(startGame);\n  window.MGS_TEST = { finish, fail, setTotal, get level(){return level}, set level(v){level=v} };\n  window.__fm = {'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----
