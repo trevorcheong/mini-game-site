@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=22"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=23"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -102,7 +102,7 @@ patch('golden-goal.html', '/* fill the whole frame */\nbody{padding:0!important}
 ])
 
 # 8 Pocket Pilot (tap-to-fly; images embedded on import; code inside an IIFE)
-patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */\n#wrap{display:block}\n#stage{position:absolute!important;left:50%;top:50%;margin:-355.5px 0 0 -200px;border-radius:0!important;box-shadow:none!important}\ncanvas{width:100%!important;height:100%!important}', [
+patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */\n#wrap{display:block}\n#stage{position:absolute!important;left:50%;top:50%;margin:-355.5px 0 0 -200px;border-radius:0!important;box-shadow:none!important}\ncanvas{width:100%!important;height:100%!important}\n/* owner: 1 life, no hearts in the HUD */\n#lives{display:none!important}', [
  ('  const amt=G.money,c=code(),win=amt>0;\n',
   '  const amt=G.money,c=code(),win=amt>0;\n  if(win) MGS.win({amount:amt,code:c,label:"RM"+amt.toFixed(2)}); else MGS.gameOver();\n'),
  ('const W=400,H=711,GROUND=694;', 'let W=400;const H=711,GROUND=694;'),
