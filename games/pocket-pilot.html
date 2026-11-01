@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=21"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=22"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */
 #wrap{display:block}
@@ -118,7 +118,7 @@ canvas{position:absolute;inset:0;width:400px;height:711px;display:block}
           <li><span>✈</span><span>Tap to fly through the gaps</span></li>
           <li><span>+</span><span>Every coin gate adds <b>RM0.10</b></span></li>
           <li><span>★</span><span>Reach the finish to win <b>RM2.00</b></span></li>
-          <li><span>♥</span><span>3 lives. You restart where you crashed and keep your money</span></li>
+          <li><span>♥</span><span>1 life. One crash ends the flight</span></li>
         </ul>
       </div>
       <button class="btn" id="playBtn" type="button">Let's Fly!</button>
@@ -152,7 +152,7 @@ canvas{position:absolute;inset:0;width:400px;height:711px;display:block}
 const CFG={
   STEP:0.10, MAX:2.00,           // RM per coin gate, top prize
   GATES_PER_COIN:2,              // a coin every N obstacles
-  LIVES:3,
+  LIVES:1,
   CLAIM_URL:"",                  // fallback; usually passed as ?claim_url=
 };
 const COINS=Math.round(CFG.MAX/CFG.STEP);           // 20

@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=21"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=22"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -112,6 +112,9 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
  ('function draw(){\n  ctx.save();', 'function draw(){\n  ctx.fillStyle="#f3cfc4";ctx.fillRect(0,0,W,H);\n  ctx.save();'),
  ('  const s=Math.min(vw/W,vh/H);\n  const phone=vw<520;',
   '  W=Math.max(320,Math.min(900,Math.round(H*vw/vh)));stage.style.width=W+"px";stage.style.marginLeft=(-W/2)+"px";\n  const s=Math.min(vw/W,vh/H);\n  const phone=true;'),
+ # owner: only 1 life
+ ('  LIVES:3,', '  LIVES:1,'),
+ ('<li><span>♥</span><span>3 lives. You restart where you crashed and keep your money</span></li>', '<li><span>♥</span><span>1 life. One crash ends the flight</span></li>'),
  ('$("againBtn").addEventListener("click",()=>{ensureAudio();replay()});',
   '$("againBtn").addEventListener("click",MGS.paid(()=>{ensureAudio();replay()}));'),
  # skip the in-game start screen (paid on the site already) + test hook
