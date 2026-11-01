@@ -133,7 +133,7 @@ window.GAMES = [
       "Tap to fly through the gaps between the storms and towers.",
       "Every coin gate adds RM0.10 to your voucher.",
       "Reach the finish to win the top prize of RM2.00.",
-      "1 life — one crash ends the flight, and you keep the money you collected."
+      "One crash ends the flight, and you keep the money you collected."
     ]
   }
 ];
