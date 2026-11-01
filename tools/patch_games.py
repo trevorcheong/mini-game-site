@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=19"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=20"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -106,6 +106,8 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
  ('  const amt=G.money,c=code(),win=amt>0;\n',
   '  const amt=G.money,c=code(),win=amt>0;\n  if(win) MGS.win({amount:amt,code:c,label:"RM"+amt.toFixed(2)}); else MGS.gameOver();\n'),
  ('const W=400,H=711,GROUND=694;', 'let W=400;const H=711,GROUND=694;'),
+ # background tiles: draw as many as the (now wider) screen needs, not a fixed 3
+ ('  for(let k=0;k<3;k++){\n    const x=off+k*bw;', '  for(let k=0;off+k*bw<W+1;k++){\n    const x=off+k*bw;'),
  ('  const s=Math.min(vw/W,vh/H);\n  const phone=vw<520;',
   '  W=Math.max(320,Math.min(900,Math.round(H*vw/vh)));stage.style.width=W+"px";stage.style.marginLeft=(-W/2)+"px";\n  const s=Math.min(vw/W,vh/H);\n  const phone=true;'),
  ('$("againBtn").addEventListener("click",()=>{ensureAudio();replay()});',

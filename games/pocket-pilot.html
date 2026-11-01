@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=19"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=20"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */
 #wrap{display:block}
@@ -415,7 +415,7 @@ function drawBG(){
   const b=IMG.bg;if(!b.naturalWidth){ctx.fillStyle="#bfe3ff";ctx.fillRect(0,0,W,H);return}
   const s=H/b.naturalHeight,bw=b.naturalWidth*s;
   const off=-(G.bgx%(bw*2));
-  for(let k=0;k<3;k++){
+  for(let k=0;off+k*bw<W+1;k++){
     const x=off+k*bw;
     if(k%2===0)ctx.drawImage(b,x,0,bw+1,H);
     else{ctx.save();ctx.translate(x+bw,0);ctx.scale(-1,1);ctx.drawImage(b,0,0,bw+1,H);ctx.restore()}

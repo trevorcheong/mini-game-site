@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=19">
+<link rel="stylesheet" href="assets/style.css?v=20">
 <style>
   html,body{height:100%;overflow:hidden}
   @supports (height:100dvh){html,body{height:100dvh}}
@@ -135,10 +135,10 @@
   </div>
 </main>
 
-<script src="games.config.js?v=19"></script>
-<script src="assets/token.js?v=19"></script>
-<script src="assets/voucher.js?v=19"></script>
-<script src="assets/common.js?v=19"></script>
+<script src="games.config.js?v=20"></script>
+<script src="assets/token.js?v=20"></script>
+<script src="assets/voucher.js?v=20"></script>
+<script src="assets/common.js?v=20"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal, closeModal, toast } = UI;
@@ -195,7 +195,7 @@
   function launch() {
     gate.classList.add("hidden");
     $("againBtn").classList.remove("hidden");
-    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=19";
+    frame.src = g.file + (g.file.includes("?") ? "&" : "?") + "v=20";
     frame.classList.add("on");
     playing = true;
   }
@@ -314,7 +314,7 @@
       let inner = "-";
       try { const w = frame.contentWindow; inner = w.innerHeight + " / doc " + w.document.documentElement.scrollHeight; } catch (e) { inner = "n/a"; }
       box.textContent = [
-        "build v19",
+        "build v20",
         "iOS class: " + de.classList.contains("ios-safari") + "   app-h class: " + de.classList.contains("app-h"),
         "--app-h: " + getComputedStyle(de).getPropertyValue("--app-h"),
         "innerHeight: " + innerHeight + "   vv: " + (vv ? Math.round(vv.height) + " (top " + Math.round(vv.offsetTop) + ")" : "-"),
