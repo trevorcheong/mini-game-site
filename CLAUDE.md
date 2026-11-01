@@ -39,7 +39,12 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
     charges, then replies `replay-ok` and the game runs `fn`
   - Clicks on `#claimBtn` / `[data-mgs-claim]` are intercepted → parent `UI.claimVoucher()`
   - Audio: the bridge wraps `AudioContext` and resumes every context on the first touch/click.
-    The in-game start screens were removed, so this is what starts the music.
+    iOS only allows audio on a **tap** (not a drag), so the sound is started by the Start tap itself:
+    play.html preloads the game hidden with `?mgs_wait=1` while the start card shows. The game
+    registers its opening with `MGS.boot(fn)` (held while waiting) and its sound setup with
+    `MGS.onAudioUnlock(fn)`. In the Start click handler play.html synchronously calls
+    `frame.contentWindow.MGS.unlockAudio()` (same origin), then after charging calls `MGS.startNow()`.
+    Cross-origin (file://) falls back to postMessage `{mgs:1,type:"start"}`. `MGS.audioStates` helps tests.
 - The bridge must load **before** the game's own scripts (patch_games.py inserts it in `<head>`).
 
 ## Game rules (agreed with the owner)
@@ -87,7 +92,8 @@ Do not treat the site as production-safe until these exist.
    - call `MGS.win` on win and `MGS.gameOver` on final loss
    - wrap replay buttons with `MGS.paid`
    - give the claim button `id="claimBtn"`
-   - add a BOOT line that skips the in-game start screen
+   - add a BOOT line that skips the in-game start screen, wrapped as `MGS.boot(function(){ … })`,
+     plus `MGS.onAudioUnlock(<the game's own audio init/resume>)` so music starts on the Start tap
      (if the game's code is wrapped in an IIFE, put the start call inside it with a replacement instead —
      see the Golden Goal entry)
 3. Run `python3 tools/patch_games.py`.
@@ -126,7 +132,8 @@ Do not treat the site as production-safe until these exist.
 No test suite. Verify with Playwright (Chromium is preinstalled in the cloud session):
 - Phone viewports such as 430×721 (iPhone, visible area), 375×560 (iPhone SE), 412×780 (Android).
 - Use an iPhone user agent to exercise the `ios-safari` path.
-- For each game: start → win → voucher appears; final loss → paid replay modal;
+- For each game: after Start, `MGS.audioStates` in the frame is all `"running"` (serve over http so the
+  frame is same-origin); start → win → voucher appears; final loss → paid replay modal;
   CLAIM with and without `claim_url`; no new tabs open.
 - Trigger game states from the console. These function names are used by the existing tests:
   - Chicken: `showWin(0.5,false)`

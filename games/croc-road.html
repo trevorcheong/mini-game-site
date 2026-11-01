@@ -172,7 +172,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
 @media (max-height:640px){.how small{display:none}.hero{height:24vh}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<script src="mgs-bridge.js?v=20"></script>
+<script src="mgs-bridge.js?v=21"></script>
 <style>/* MGS: mini game site */
 #replayHud{display:none!important}
 </style>
@@ -933,7 +933,8 @@ for (let k = 0; k < 150; k++) updateTraffic(1 / 30);
 requestAnimationFrame(frame);
 
 /* MGS: skip in-game start screen */
-startScreen.hidden = true;
+MGS.onAudioUnlock(unlockAudio);
+MGS.boot(function(){ startScreen.hidden = true; });
 </script>
 
 </body>

@@ -105,7 +105,7 @@
   @media (prefers-reduced-motion:reduce){.btn.pulse,#goBtn:not(:disabled){animation:none}}
 </style>
 
-<script src="mgs-bridge.js?v=20"></script>
+<script src="mgs-bridge.js?v=21"></script>
 <style>/* MGS: mini game site */
 
 </style>
@@ -821,7 +821,8 @@ requestAnimationFrame(loop);
 window.__game = { S, go, cashOut, CONFIG, A };
 
 /* MGS: skip in-game start screen */
-startGame();
+MGS.onAudioUnlock(function(){ if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); AC.resume && AC.resume(); });
+MGS.boot(startGame);
 </script>
 </body>
 </html>

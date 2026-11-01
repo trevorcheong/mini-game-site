@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=20"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=21"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -97,7 +97,7 @@ patch('golden-goal.html', '/* fill the whole frame */\nbody{padding:0!important}
  # skip the in-game start screen (paid on the site already) + test hook
  ('renderHud(false);\nloadAll.then(() => { fitStage(); requestAnimationFrame(loop); });',
   'renderHud(false);\nloadAll.then(() => { fitStage(); requestAnimationFrame(loop); });\n'
-  '/* MGS: skip in-game start screen */\n$("startScreen").hidden = true; start();\n'
+  '/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audio);\nMGS.boot(function(){ $("startScreen").hidden = true; start(); });\n'
   'window.MGS_TEST = { game: game, endRound: endRound };'),
 ])
 
@@ -108,6 +108,8 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
  ('const W=400,H=711,GROUND=694;', 'let W=400;const H=711,GROUND=694;'),
  # background tiles: draw as many as the (now wider) screen needs, not a fixed 3
  ('  for(let k=0;k<3;k++){\n    const x=off+k*bw;', '  for(let k=0;off+k*bw<W+1;k++){\n    const x=off+k*bw;'),
+ # safety: repaint the whole canvas each frame so nothing can leave trails
+ ('function draw(){\n  ctx.save();', 'function draw(){\n  ctx.fillStyle="#f3cfc4";ctx.fillRect(0,0,W,H);\n  ctx.save();'),
  ('  const s=Math.min(vw/W,vh/H);\n  const phone=vw<520;',
   '  W=Math.max(320,Math.min(900,Math.round(H*vw/vh)));stage.style.width=W+"px";stage.style.marginLeft=(-W/2)+"px";\n  const s=Math.min(vw/W,vh/H);\n  const phone=true;'),
  ('$("againBtn").addEventListener("click",()=>{ensureAudio();replay()});',
@@ -115,26 +117,19 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
  # skip the in-game start screen (paid on the site already) + test hook
  ('ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));',
   'ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));\n'
-  '/* MGS: skip in-game start screen */\n$("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space");\n'
+  '/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(ensureAudio);\nMGS.boot(function(){ $("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space"); });\n'
   'window.MGS_TEST={get G(){return G},showResult:showResult,win:win,crash:crash};'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----
 BOOT = {
- 'chicken-cross-game.html': "startGame();",
- 'croc-road.html': "startScreen.hidden = true;",
- 'fortune-catch.html': "$('startScreen').classList.add('hidden'); setTimeout(startGame, 300);\n"
-   "/* MGS: shrink result cards to fit short screens (hero art sticks out ~92px above the card) */\n"
-   "(function(){ function fit(){ document.querySelectorAll('.overlay .card').forEach(function(c){ var ov=c.closest('.overlay'); if(!ov||ov.classList.contains('hidden')) return;"
-   " c.style.scale='1'; c.style.translate='0 0'; var r=c.getBoundingClientRect(); var top=r.top, bot=r.bottom;"
-   " c.querySelectorAll('.hero').forEach(function(h){ var hr=h.getBoundingClientRect(); if(hr.height) top=Math.min(top,hr.top); });"
-   " var H=bot-top; var s=Math.max(.5,Math.min(1,(innerHeight-20)/H,(innerWidth-20)/r.width)); var cy=(r.top+r.bottom)/2;"
-   " var nt=cy-(cy-top)*s, nb=cy+(bot-cy)*s; var dy=innerHeight/2-(nt+nb)/2;"
-   " c.style.scale=String(s); c.style.translate='0 '+Math.round(dy)+'px'; }); }"
-   " addEventListener('resize',fit); if(window.ResizeObserver){ var ro=new ResizeObserver(fit); document.querySelectorAll('.overlay .card').forEach(function(c){ro.observe(c);}); }"
-   " new MutationObserver(fit).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']}); fit(); })();",
- 'gold-rush-mines.html': '$("startModal").hidden = true;',
- 'jungle-whack.html': "startGame();",
+ # MGS.onAudioUnlock: called by play.html inside the Start tap (iPhone only plays sound after a tap)
+ # MGS.boot: in preload mode (?mgs_wait=1) waits for play.html's MGS.startNow(), otherwise runs at once
+ 'chicken-cross-game.html': "MGS.onAudioUnlock(function(){ if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); AC.resume && AC.resume(); });\nMGS.boot(startGame);",
+ 'croc-road.html': "MGS.onAudioUnlock(unlockAudio);\nMGS.boot(function(){ startScreen.hidden = true; });",
+ 'fortune-catch.html': "MGS.onAudioUnlock(function(){ Sound.unlock(); });\nMGS.boot(function(){ $('startScreen').classList.add('hidden'); startGame(); });",
+ 'gold-rush-mines.html': 'MGS.onAudioUnlock(function(){ try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)(); ac.resume&&ac.resume(); }catch(e){} });\nMGS.boot(function(){ $("startModal").hidden = true; });',
+ 'jungle-whack.html': "MGS.onAudioUnlock(function(){ try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); actx.resume&&actx.resume(); }catch(e){} });\nMGS.boot(startGame);",
 }
 for fn, code in BOOT.items():
     s = open(O+fn, encoding='utf-8').read()
@@ -144,6 +139,7 @@ for fn, code in BOOT.items():
 # Neon: go straight to the LAUNCH screen (no intro), also on paid replay
 fn = 'neon-rocket-standalone.html'; s = open(O+fn, encoding='utf-8').read()
 for a, b in [("store.clear(); show('intro'); // MGS", "store.clear(); show(null); // MGS"),
-             ("resetIdle(); show('intro');\n}", "resetIdle(); show(null);\n}")]:
+             ("resetIdle(); show('intro');\n}", "resetIdle(); show(null);\n}"),
+             ("store.clear(); show(null); // MGS", "MGS.onAudioUnlock(function(){ ac(); }); MGS.boot(function(){}); store.clear(); show(null); // MGS")]:
     assert s.count(a) == 1, a; s = s.replace(a, b)
 open(O+fn, 'w', encoding='utf-8').write(s); print('boot', fn)

@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=20"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=21"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */
 #wrap{display:block}
@@ -490,6 +490,7 @@ function drawGround(){
   ctx.fillStyle="#9be08a";for(let x=off;x<W;x+=40){ctx.beginPath();ctx.ellipse(x+14,GROUND-4,8,3,0,0,7);ctx.fill()}
 }
 function draw(){
+  ctx.fillStyle="#f3cfc4";ctx.fillRect(0,0,W,H);
   ctx.save();
   if(G.shake)ctx.translate(rnd(-G.shake,G.shake),rnd(-G.shake,G.shake));
   drawBG();
@@ -500,7 +501,8 @@ function draw(){
 
 ready.then(()=>requestAnimationFrame(t=>{last=t;frame(t)}));
 /* MGS: skip in-game start screen */
-$("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space");
+MGS.onAudioUnlock(ensureAudio);
+MGS.boot(function(){ $("start").hidden=true;$("hud").hidden=false;showTap("Tap to fly","Tap or press Space"); });
 window.MGS_TEST={get G(){return G},showResult:showResult,win:win,crash:crash};
 })();
 </script>

@@ -151,7 +151,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
   .t-amt{font-size:60px}
 }
 </style>
-<script src="mgs-bridge.js?v=20"></script>
+<script src="mgs-bridge.js?v=21"></script>
 <style>/* MGS: mini game site */
 
 </style>
@@ -906,7 +906,7 @@ $('#ladder').innerHTML = CONFIG.TIERS.map(t => `<div><span>${t.min.toFixed(2)}×
 els.shield.textContent = `Shield on · rocket safe until ${CONFIG.SHIELD_MIN.toFixed(2)}×`;
 setBalance(); resetIdle();
 if(location.hash === '#reset') store.clear(); // testing: open the page with #reset to wipe the saved voucher
-store.clear(); show(null); // MGS: every paid game starts fresh
+MGS.onAudioUnlock(function(){ ac(); }); MGS.boot(function(){}); store.clear(); show(null); // MGS: every paid game starts fresh
 </script>
 </body>
 </html>

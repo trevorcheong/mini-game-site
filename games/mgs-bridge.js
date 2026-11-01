@@ -12,6 +12,11 @@
    声音：浏览器要求玩家在游戏里点一下才可以播放。这里会记录游戏建立的所有
    AudioContext，玩家第一次点击/触碰时把它们全部启动（iPhone 静音键开着也尽量播放）。
    这个 script 要放在游戏自己的 script 之前。
+
+   预载 + 同一下点击启动声音（iPhone 只有「点一下」才准播放声音，拖动不算）：
+     play.html 会先用 ?mgs_wait=1 在后台载入游戏，游戏用 MGS.boot(fn) 登记开局动作但先不执行；
+     玩家按网站的 Start 时，网站在同一下点击里呼叫 MGS.unlockAudio()（执行 MGS.onAudioUnlock 登记的
+     声音启动函数），扣完 TOKEN 再呼叫 MGS.startNow() 开局。
    ========================================================= */
 (function () {
   var embedded = window.parent !== window;
@@ -32,6 +37,7 @@
     try { Object.setPrototypeOf(Wrapped, Orig); } catch (e) {}
     window[name] = Wrapped;
   });
+  var unlockHooks = [];
   function wakeAudio() {
     try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
     contexts.forEach(function (ctx) {
@@ -47,6 +53,19 @@
   ["pointerdown", "pointerup", "touchstart", "touchend", "mousedown", "click", "keydown"].forEach(function (ev) {
     window.addEventListener(ev, wakeAudio, { capture: true, passive: true });
   });
+
+  /* ---------- 预载：等网站说开始才开局 ---------- */
+  var waiting = embedded && /[?&]mgs_wait=1(&|$)/.test(location.search);
+  var bootFns = [];
+  function startNow() {
+    waiting = false;
+    var fns = bootFns; bootFns = [];
+    fns.forEach(function (fn) { try { fn(); } catch (e) { setTimeout(function () { throw e; }); } });
+  }
+  function unlockAudio() {
+    unlockHooks.forEach(function (fn) { try { fn(); } catch (e) {} });
+    wakeAudio();
+  }
 
   /* ---------- 领取：接管 CLAIM NOW ---------- */
   var lastWin = null;
@@ -69,7 +88,9 @@
 
   window.addEventListener("message", function (e) {
     var d = e.data;
-    if (!d || d.mgs !== 1 || !pending || d.id !== pending.id) return;
+    if (!d || d.mgs !== 1) return;
+    if (d.type === "start") { unlockAudio(); startNow(); return; }   // 跨来源时的后备做法
+    if (!pending || d.id !== pending.id) return;
     var fn = pending.fn;
     pending = null;
     if (d.type === "replay-ok") fn();
@@ -83,6 +104,12 @@
       post({ type: "win", amount: v.amount, code: v.code, label: v.label });
     },
     gameOver: function () { post({ type: "over" }); },
+    boot: function (fn) { if (waiting) bootFns.push(fn); else fn(); },
+    startNow: startNow,
+    onAudioUnlock: function (fn) { unlockHooks.push(fn); },
+    unlockAudio: unlockAudio,
+    get waiting() { return waiting; },
+    get audioStates() { return contexts.map(function (c) { return c.state; }); },
     paid: function (fn) {
       return function () {
         var self = this, args = arguments;
