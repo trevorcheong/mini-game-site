@@ -1,8 +1,9 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=18"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=19"></script>
 <style>/* MGS: mini game site */
-/* keep the scaled 400x711 stage centred even when the frame is shorter than 711px */
+/* fill the whole frame: stage is 711 tall, its width follows the screen shape (set in fit) */
 #wrap{display:block}
-#stage{position:absolute!important;left:50%;top:50%;margin:-355.5px 0 0 -200px}
+#stage{position:absolute!important;left:50%;top:50%;margin:-355.5px 0 0 -200px;border-radius:0!important;box-shadow:none!important}
+canvas{width:100%!important;height:100%!important}
 </style>
 </head><body>
 <title>Pocket Pilot</title>
@@ -161,13 +162,14 @@ const TOKEN=qs.get("token")||"";
 const CLAIM=qs.get("claim_url")||qs.get("return_url")||CFG.CLAIM_URL;
 
 /* ---------- Stage scaling ---------- */
-const W=400,H=711,GROUND=694;
+let W=400;const H=711,GROUND=694;
 const stage=document.getElementById("stage"),cv=document.getElementById("cv"),ctx=cv.getContext("2d");
 let DPR=1;
 function fit(){
   const vw=innerWidth,vh=innerHeight;
+  W=Math.max(320,Math.min(900,Math.round(H*vw/vh)));stage.style.width=W+"px";stage.style.marginLeft=(-W/2)+"px";
   const s=Math.min(vw/W,vh/H);
-  const phone=vw<520;
+  const phone=true;
   stage.classList.toggle("flat",phone);
   const sc=phone?s:s*0.94;
   stage.style.transform=`scale(${sc})`;

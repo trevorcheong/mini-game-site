@@ -139,5 +139,8 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     `MGS_TEST.game.cents=70; MGS_TEST.endRound()` (cents 0 → loss screen)
   - Pocket Pilot: also an IIFE → `MGS_TEST.G.money=0.7; MGS_TEST.G.state='over'; MGS_TEST.showResult()`
     (money 0 → loss), `MGS_TEST.win()` reaches the finish (RM2.00)
-- Check the game's own stage fits the frame on short phones: some games scale a fixed-size stage
-  and centre it with grid, which pushes it down when the frame is shorter (Pocket Pilot needed a CSS fix).
+- Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
+  their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
+  Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
+  Golden Goal sizes the stage to the frame and keeps the ball/striker in view (`oy` clamp).
+  Check stage rect == frame size at 390×650, 375×489 and the desktop frame (~478×705).
