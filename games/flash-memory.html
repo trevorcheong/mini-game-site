@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=33"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=34"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame */
 body{padding:0!important}
@@ -9,6 +9,11 @@ body::after{display:none!important}
 .console{padding:min(14px,3%)!important}
 .pads{gap:min(14px,4%)!important}
 @media (max-height:560px){.bubble{padding:5px 16px 7px}.bubble .big{font-size:20px}.bubble .sub{font-size:13px}#play{gap:6px}}
+/* 3-2-1 countdown */
+.cd{position:absolute;inset:0;z-index:8;display:grid;place-items:center;pointer-events:none}
+.cd b{font-family:var(--display);font-weight:700;font-size:min(130px,22vh);line-height:1;color:var(--gold);-webkit-text-stroke:3px #7a3d00;text-shadow:0 6px 0 #7a3d00,0 0 40px rgba(255,201,60,.8);animation:cdPop .8s ease-out forwards}
+.cd b.go{font-size:min(96px,16vh);color:#7dffb0;-webkit-text-stroke:3px #0b6b3a;text-shadow:0 6px 0 #0b6b3a,0 0 40px rgba(80,255,160,.7)}
+@keyframes cdPop{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.15);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(.85);opacity:0}}
 /* result cards are scaled to fit in JS (fitSheets) */
 </style>
 </head><body>
@@ -458,10 +463,21 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     $("#voucher").hidden = true; $("#lose").hidden = true; $("#claimMsg").textContent = "";
     app.appendChild($("#fx")); fx.clear(); show("play");
     for (let i=0;i<START_LEN-1;i++) seq.push(rand());
-    nextLevel(runId);
+    countdown(runId);
   }
   const rand = () => Math.floor(Math.random()*4);
 
+  async function countdown(id){
+    busy = true; padBox.className = "pads wait"; $("#lvl").textContent = 1; paintLadder(); pose(mascot,"think");
+    const box = document.createElement("div"); box.className = "cd"; app.appendChild(box);
+    for (const n of [3,2,1]){
+      say("Get ready…", "Starting in " + n); box.innerHTML = "<b>" + n + "</b>"; tone(660,.16,"square",.09);
+      await wait(800); if (id!==runId){ box.remove(); return; }
+    }
+    say("Go!", "Level 1 · 3 lights"); box.innerHTML = "<b class=go>GO!</b>"; tone(990,.35,"triangle",.16); pose(mascot,"cheer");
+    await wait(650); box.remove(); if (id!==runId) return;
+    nextLevel(id);
+  }
   async function nextLevel(id){
     seq.push(rand()); step = 0; busy = true;
     $("#lvl").textContent = level+1; paintLadder();

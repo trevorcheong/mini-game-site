@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=33"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=34"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -132,7 +132,7 @@ patch('pocket-pilot.html', '/* fill the whole frame: stage is 711 tall, its widt
 
 # 9 Flash Memory: Simon-style memory, 10 levels, up to RM2.00. One wrong light ends the run:
 #   total>0 -> voucher (MGS.win), nothing won -> lose card (MGS.gameOver). Code is an IIFE -> test hook MGS_TEST.
-patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important}\nbody::after{display:none!important}\n#app{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}\n/* phones: character and light pads shrink with the frame height so nothing overlaps or gets cut off */\n.arena{padding-bottom:2%!important}\n.console{padding:min(14px,3%)!important}\n.pads{gap:min(14px,4%)!important}\n@media (max-height:560px){.bubble{padding:5px 16px 7px}.bubble .big{font-size:20px}.bubble .sub{font-size:13px}#play{gap:6px}}\n/* result cards are scaled to fit in JS (fitSheets) */', [
+patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important}\nbody::after{display:none!important}\n#app{width:100%!important;height:100%!important;border-radius:0!important;box-shadow:none!important}\n/* phones: character and light pads shrink with the frame height so nothing overlaps or gets cut off */\n.arena{padding-bottom:2%!important}\n.console{padding:min(14px,3%)!important}\n.pads{gap:min(14px,4%)!important}\n@media (max-height:560px){.bubble{padding:5px 16px 7px}.bubble .big{font-size:20px}.bubble .sub{font-size:13px}#play{gap:6px}}\n/* 3-2-1 countdown */\n.cd{position:absolute;inset:0;z-index:8;display:grid;place-items:center;pointer-events:none}\n.cd b{font-family:var(--display);font-weight:700;font-size:min(130px,22vh);line-height:1;color:var(--gold);-webkit-text-stroke:3px #7a3d00;text-shadow:0 6px 0 #7a3d00,0 0 40px rgba(255,201,60,.8);animation:cdPop .8s ease-out forwards}\n.cd b.go{font-size:min(96px,16vh);color:#7dffb0;-webkit-text-stroke:3px #0b6b3a;text-shadow:0 6px 0 #0b6b3a,0 0 40px rgba(80,255,160,.7)}\n@keyframes cdPop{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.15);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(.85);opacity:0}}\n/* result cards are scaled to fit in JS (fitSheets) */', [
   # claim goes through the site (bridge intercepts #claimBtn)
   ('<a class="btn3d shine" id="btnClaim" href="#claim">', '<a class="btn3d shine" id="claimBtn" href="#claim">'),
   ('const claim = $("#btnClaim");', 'const claim = $("#claimBtn");'),
@@ -145,6 +145,11 @@ patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important
   ('$("#btnReplay").onclick = startGame;\n  $("#btnRetry").onclick = startGame;',
    '$("#btnReplay").onclick = MGS.paid(startGame);\n  $("#btnRetry").onclick = MGS.paid(startGame);'),
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  # 3-2-1 countdown after Start (and after a paid replay) before the first lights flash
+  ('    for (let i=0;i<START_LEN-1;i++) seq.push(rand());\n    nextLevel(runId);',
+   '    for (let i=0;i<START_LEN-1;i++) seq.push(rand());\n    countdown(runId);'),
+  ('  async function nextLevel(id){',
+   '  async function countdown(id){\n    busy = true; padBox.className = "pads wait"; $("#lvl").textContent = 1; paintLadder(); pose(mascot,"think");\n    const box = document.createElement("div"); box.className = "cd"; app.appendChild(box);\n    for (const n of [3,2,1]){\n      say("Get ready…", "Starting in " + n); box.innerHTML = "<b>" + n + "</b>"; tone(660,.16,"square",.09);\n      await wait(800); if (id!==runId){ box.remove(); return; }\n    }\n    say("Go!", "Level 1 · 3 lights"); box.innerHTML = "<b class=go>GO!</b>"; tone(990,.35,"triangle",.16); pose(mascot,"cheer");\n    await wait(650); box.remove(); if (id!==runId) return;\n    nextLevel(id);\n  }\n  async function nextLevel(id){'),
   # result cards: scale down to fit short phones so CLAIM / PLAY AGAIN stay visible
   ('  function makeCode(){', '  function fitSheets(){ document.querySelectorAll(".overlay:not([hidden]) .sheet").forEach(function(el){ el.style.transform=""; var k=Math.min(1,(innerHeight-24)/el.offsetHeight,(innerWidth-24)/el.offsetWidth); if(k<1){ var dy=(innerHeight-el.offsetHeight*k)/2-el.offsetTop; el.style.transformOrigin="50% 0"; el.style.transform="translateY("+dy.toFixed(1)+"px) scale("+k.toFixed(3)+")"; } }); }\n  addEventListener("resize", fitSheets);\n  function makeCode(){'),
   ('    pose($("#vMascot"), perfect ? "coin" : "thumbs");', '    fitSheets();\n    pose($("#vMascot"), perfect ? "coin" : "thumbs");'),

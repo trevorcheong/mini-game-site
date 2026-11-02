@@ -158,6 +158,8 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
   - Flash Memory: also an IIFE → `__fm.seq` / `__fm.press(i)` play a level; a wrong press ends the run
     (won > 0 → voucher, else loss card); `MGS_TEST.setTotal(2,false); MGS_TEST.level=10; MGS_TEST.finish(true)`
     = perfect run. Its result cards scale to fit short frames (`fitSheets`).
+    A 3-2-1-GO countdown (`countdown()`, ~3 s) runs after Start and after a paid replay before level 1;
+    tests that wait for `!__fm.busy` already cover it.
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
