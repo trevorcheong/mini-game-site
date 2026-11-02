@@ -155,7 +155,7 @@ window.GAMES = [
     id: "stack-stack-win",
     title: "Stack Stack Win",
     file: "games/stack-stack-win.html",
-    thumb: "thumbs/stack-stack-win.jpg",
+    thumb: "thumbs/stack-stack-win.jpg?v=37",
     cost: 1,
     tag: "NEW",
     color: "#ff6f61",
