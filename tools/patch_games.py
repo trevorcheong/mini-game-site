@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=35"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=36"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -155,6 +155,25 @@ patch('flash-memory.html', '/* fill the whole frame */\nbody{padding:0!important
   ('    pose($("#vMascot"), perfect ? "coin" : "thumbs");', '    fitSheets();\n    pose($("#vMascot"), perfect ? "coin" : "thumbs");'),
   ('  window.__fm = {',
    '  /* MGS: real frame height for the layout (iPhone can size dvh oddly inside a frame) */\n  /* character + light pads sized in px from the real frame height (iPhone Safari ignored the CSS version) */\n  function fitPlay(){ var H = innerHeight, ms = Math.max(56, Math.min(265, H * .3 - 60)), cw = Math.max(120, Math.min(innerWidth - 32, 340, H - 236 - ms * .9)); var ar = document.querySelector(".arena"), co = document.querySelector(".console"); ar.style.setProperty("--ms", ms + "px", "important"); co.style.setProperty("width", cw + "px", "important"); var gap = cw >= 260 ? 14 : 10, pd = gap, sz = Math.floor((cw - 2 * pd - gap) / 2); co.style.setProperty("padding", pd + "px", "important"); var pb = document.getElementById("pads"); pb.style.setProperty("grid-template-columns", sz + "px " + sz + "px", "important"); pb.style.setProperty("gap", gap + "px", "important"); pb.style.setProperty("justify-content", "center"); document.querySelectorAll(".pad").forEach(function(el){ el.style.setProperty("width", sz + "px", "important"); el.style.setProperty("height", sz + "px", "important"); el.style.setProperty("aspect-ratio", "auto", "important"); el.style.setProperty("min-width", "0", "important"); }); }\n  fitPlay(); addEventListener("resize", fitPlay); setTimeout(fitPlay, 300);\n  /* MGS: skip in-game start screen */\n  MGS.onAudioUnlock(function(){ try{ ac = ac || new (window.AudioContext||window.webkitAudioContext)(); ac.resume && ac.resume(); }catch(e){} });\n  MGS.boot(startGame);\n  window.MGS_TEST = { finish, fail, setTotal, get level(){return level}, set level(v){level=v} };\n  window.__fm = {'),
+])
+
+# 10 Stack Stack Win: 3D stacking (three.js r128, bundled in games/vendor). 20 layers x RM0.10 = RM2.00.
+#   One miss ends the run: placed>0 -> voucher (MGS.win), nothing stacked -> MGS.gameOver. IIFE -> test hook MGS_TEST.
+patch('stack-stack-win.html', '/* fill the whole frame (the game was a 9:16 phone shape) */\n.phone{width:100%!important;height:100%!important;aspect-ratio:auto!important;max-width:none!important;border-radius:0!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}', [
+  # three.js from our own server instead of the CDN
+  ('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>',
+   '<script src="vendor/three-r128.min.js"></script>'),
+  # report the result to the site; result card scales to fit short phones
+  ("  $('resultScreen').hidden = false;\n",
+   "  $('resultScreen').hidden = false;\n  fitResult();\n  if (placed) MGS.win({ amount: Number(value), code: lastCode, label: 'RM' + value }); else MGS.gameOver();\n"),
+  ('function copyCode() {',
+   'function fitResult(){ const el = document.querySelector(".result"); el.style.transform = ""; const k = Math.min(1, (phone.clientHeight - 32) / el.offsetHeight, (phone.clientWidth - 24) / el.offsetWidth); if (k < 1) { const dy = (phone.clientHeight - el.offsetHeight * k) / 2 - el.offsetTop; el.style.transformOrigin = "50% 0"; el.style.transform = "translateY(" + dy.toFixed(1) + "px) scale(" + k.toFixed(3) + ")"; } }\nwindow.addEventListener("resize", () => { if (!$("resultScreen").hidden) fitResult(); });\nfunction copyCode() {'),
+  # play again after a win or a loss costs TOKEN
+  ("$('replayBtn').addEventListener('click', e => { e.stopPropagation(); start(); });",
+   "const paidStart = MGS.paid(start);\n$('replayBtn').addEventListener('click', e => { e.stopPropagation(); paidStart(); });"),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('requestAnimationFrame(loop);\n})();',
+   'requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(function(){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); actx.resume && actx.resume(); }catch(e){} });\nMGS.boot(start);\nwindow.MGS_TEST = { win, lose, drop, showResult, get placed(){ return placed; }, set placed(v){ placed = v; updateHud(); }, get state(){ return state; }, get cur(){ return cur; }, get top(){ return stack[stack.length-1]; } };\n})();'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----

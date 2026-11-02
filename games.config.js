@@ -150,5 +150,20 @@ window.GAMES = [
       "Every level you clear adds to your voucher, up to RM2.00.",
       "One wrong light ends the game, and you keep what you won."
     ]
+  },
+  {
+    id: "stack-stack-win",
+    title: "Stack Stack Win",
+    file: "games/stack-stack-win.html",
+    thumb: "thumbs/stack-stack-win.jpg",
+    cost: 1,
+    tag: "NEW",
+    color: "#ff6f61",
+    howTo: [
+      "Tap to drop each sliding block onto the tower.",
+      "Every layer you land adds RM0.10 to your voucher.",
+      "Reach layer 20 to win the full RM2.00. Blocks get faster as you go up.",
+      "Miss and the game ends, and you keep what you stacked."
+    ]
   }
 ];
