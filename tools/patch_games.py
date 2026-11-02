@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=34"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=35"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -34,7 +34,7 @@ patch('chicken-cross-game.html', '', [
 ])
 
 # 2 Croco Road: 3 tries; retryBtn = free next try, crashReplay = new game (paid)
-patch('croc-road.html', '#replayHud{display:none!important}', [
+patch('croc-road.html', '#replayHud{display:none!important}\n/* owner: no white focus frame on buttons (the game focuses them when a result screen opens) */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}', [
  ("    if (!returning) $('winMsg').textContent = `You won a ${amountLabel(v.amount)} voucher!`;",
   "    if (!returning) { $('winMsg').textContent = `You won a ${amountLabel(v.amount)} voucher!`; MGS.win({ amount: v.amount, code: v.code, label: amountLabel(v.amount) }); }"),
  ("    $('retryBtn').hidden = left <= 0; $('crashReplay').hidden = left > 0;",
@@ -83,7 +83,7 @@ patch('neon-rocket-standalone.html', '', [
 ])
 
 # 7 Golden Goal (penalty kicks; all code lives inside one IIFE, so hooks go inside it)
-patch('golden-goal.html', '/* fill the whole frame */\nbody{padding:0!important}\n.stage{border-radius:0!important;box-shadow:none!important;max-width:none!important;max-height:none!important}', [
+patch('golden-goal.html', '/* fill the whole frame */\nbody{padding:0!important}\n.stage{border-radius:0!important;box-shadow:none!important;max-width:none!important;max-height:none!important}\n/* owner: no white focus frame on buttons (the game focuses them when a result screen opens) */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}', [
  ('  if (aw / ah > 9 / 16) { h = ah; w = h * 9 / 16; }            // PC / landscape: classic 9:16\n  else { w = aw; h = Math.min(ah, w * 19.5 / 9); }             // phones: use the extra height',
   '  h = ah; w = Math.min(aw, ah * 0.9);                          // MGS: fill the frame (cap on very wide screens)'),
  ('  view = { s, ox: (w - W * s) / 2, oy: (h - H * s) / 2, dpr };',
