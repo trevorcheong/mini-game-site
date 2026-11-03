@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=44"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=45"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame (the game was capped at 480px wide) */
 #app{max-width:none!important}
@@ -27,13 +27,13 @@ const CONFIG = {
   REWARD_PER_PULL: 0.10,    // reward per successful pull (RM)
   MAX_REWARD: 2.00,         // reward cap (RM)
 
-  ZONE_WIDTH_START: 0.44,   // green zone width on round 1 (fraction of the bar, 0~1)
+  ZONE_WIDTH_START: 0.352,   // green zone width on round 1 (fraction of the bar, 0~1)
   ZONE_SHRINK: 0.93,        // after each success: zone width x this
-  ZONE_WIDTH_MIN: 0.09,     // the zone never gets narrower than this
+  ZONE_WIDTH_MIN: 0.072,     // the zone never gets narrower than this
 
-  SPEED_START: 0.62,        // pointer speed (bar lengths per second)
+  SPEED_START: 0.744,        // pointer speed (bar lengths per second)
   SPEED_GROWTH: 1.045,       // after each success: speed x this
-  SPEED_MAX: 2.0,           // speed cap
+  SPEED_MAX: 2.4,           // speed cap
 
   MIN_HOLD_MS: 120,         // a hold shorter than this counts as an accidental tap
 

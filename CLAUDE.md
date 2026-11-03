@@ -172,6 +172,7 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
   - Sword in the Stone: IIFE → hold the mouse and release while `MGS_TEST.game.pos` is inside `zoneX…zoneX+zoneW`;
     `MGS_TEST.game.pulls=19; MGS_TEST.onSuccess()` = RM2.00 win, `MGS_TEST.game.pulls=0; MGS_TEST.onFail()` = loss.
     Its images were separate files in the artifact and are embedded as data URIs. Result card scales to fit (`fitResult`).
+    Owner asked for 20% harder: green zone starts at 0.352 (min 0.072), gem speed 0.744 (max 2.4).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
