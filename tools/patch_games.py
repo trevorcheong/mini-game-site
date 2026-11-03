@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=42"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=43"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -195,6 +195,25 @@ patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!importa
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ('resize(); refreshPlays(); requestAnimationFrame(frame);',
    'resize(); refreshPlays(); requestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { get state(){ return state; }, get cents(){ return cents; }, get misses(){ return misses; }, get objs(){ return objs; },\n  end(c, reason){ cents = c; cuts = Math.floor(c / 10) * 3; endReason = reason || "bomb"; showResult(); } };'),
+])
+
+# 12 Sword in the Stone: hold, release in the green zone. Each pull RM0.10, 20 pulls = RM2.00. One miss ends it:
+#   pulls>0 -> voucher (MGS.win), nothing pulled -> MGS.gameOver. IIFE -> test hook MGS_TEST. Images embedded as data URIs.
+patch('sword-in-stone.html', '/* fill the whole frame (the game was capped at 480px wide) */\n#app{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitResult sets --k / --dy), keeping its pop-in */\n#resultScreen .card{transform:translateY(calc(var(--dy,0px) + 30px)) scale(calc(var(--k,1) * .8))}\n#resultScreen.show .card{transform:translateY(var(--dy,0px)) scale(var(--k,1))}', [
+  # never open a new window for the claim (the site takes over #claimBtn)
+  ('<a class="btn claim" id="claimBtn" href="#" target="_blank" rel="noopener">', '<a class="btn claim" id="claimBtn" href="#">'),
+  # report the result to the site; the result card scales to fit
+  ('  renderResult(rec, false);\n}',
+   '  renderResult(rec, false);\n  fitResult();\n  if (amount > 0) MGS.win({ amount: amount, code: rec.code, label: fmtRM(amount) }); else MGS.gameOver();\n}\n'
+   'function fitResult(){ const card = document.querySelector("#resultScreen .card"), ov = $("#resultScreen"); card.style.setProperty("--k", 1); card.style.setProperty("--dy", "0px");\n'
+   '  const knight = 128, avail = ov.clientHeight - 24, k = Math.min(1, avail / (card.offsetHeight + knight), (ov.clientWidth - 16) / card.offsetWidth);\n'
+   '  card.style.setProperty("--k", k.toFixed(3)); card.style.setProperty("--dy", (knight / 2 * k).toFixed(1) + "px"); }\n'
+   'window.addEventListener("resize", () => { if ($("#resultScreen").classList.contains("show")) fitResult(); });'),
+  # play again after a win or a loss costs TOKEN
+  ("$('#againBtn').addEventListener('click', startGame);", "$('#againBtn').addEventListener('click', MGS.paid(startGame));"),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('preload(() => {}).then(() => {',
+   '/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(ensureAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { game, onSuccess, onFail, onWin, showResult, layout };\npreload(() => {}).then(() => {'),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

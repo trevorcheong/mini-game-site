@@ -180,5 +180,20 @@ window.GAMES = [
       "Slice 3 or more in one swipe for a combo bonus.",
       "Hit a bomb or drop 3 fruits and it's over. You keep what you won, up to RM2.00."
     ]
+  },
+  {
+    id: "sword-in-stone",
+    title: "Sword in the Stone",
+    file: "games/sword-in-stone.html",
+    thumb: "thumbs/sword-in-stone.jpg?v=43",
+    cost: 1,
+    tag: "NEW",
+    color: "#f7c95a",
+    howTo: [
+      "Hold the screen and the gem slides along the bar.",
+      "Release in the green zone to pull the sword. Each pull adds RM0.10.",
+      "The zone gets smaller and the gem gets faster.",
+      "Miss once and it's over. You keep what you won, up to RM2.00."
+    ]
   }
 ];
