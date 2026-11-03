@@ -185,7 +185,7 @@ window.GAMES = [
     id: "sword-in-stone",
     title: "Sword in the Stone",
     file: "games/sword-in-stone.html",
-    thumb: "thumbs/sword-in-stone.jpg?v=43",
+    thumb: "thumbs/sword-in-stone.jpg?v=44",
     cost: 1,
     tag: "NEW",
     color: "#f7c95a",
