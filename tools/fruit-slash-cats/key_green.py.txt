@@ -1,0 +1,23 @@
+import sys
+from PIL import Image, ImageFilter
+def key(src, dst, out_h=300):
+    im=Image.open(src).convert('RGB'); w,h=im.size; px=im.load()
+    a=Image.new('L',(w,h)); ap=a.load(); out=Image.new('RGBA',(w,h)); op=out.load()
+    for x in range(w):
+        for y in range(h):
+            r,g,b=px[x,y]
+            gd=g-max(r,b)            # how "green" this pixel is
+            if gd>90: al=0
+            elif gd<25: al=255
+            else: al=int(255*(90-gd)/65)
+            # despill: pull green down to the larger of red/blue
+            if g>max(r,b): g=max(r,b)
+            op[x,y]=(r,g,b,al)
+    # tighten edge a touch and smooth
+    al=out.split()[3].filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.7))
+    out.putalpha(al)
+    bbox=out.split()[3].point(lambda v:255 if v>8 else 0).getbbox()
+    out=out.crop(bbox); s=out_h/out.size[1]
+    out=out.resize((max(1,int(out.size[0]*s)),out_h),Image.LANCZOS)
+    out.save(dst,'WEBP',quality=92,method=6); return out.size
+if __name__=='__main__': print(key(sys.argv[1],sys.argv[2]))

@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=41"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=42"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -197,12 +197,12 @@ patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!importa
    'resize(); refreshPlays(); requestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { get state(){ return state; }, get cents(){ return cents; }, get misses(){ return misses; }, get objs(){ return objs; },\n  end(c, reason){ cents = c; cuts = Math.floor(c / 10) * 3; endReason = reason || "bomb"; showResult(); } };'),
 ])
 
-# Fruit Slash: swap in the cleaned cat poses from tools/fruit-slash-cats/*.webp
-# (the originals had white leftovers, e.g. a white patch behind the head in the cheer poses)
+# Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a
+# pure green background and cut out with key_green.py.txt, because the original cat art had white edges)
 import re as _re, base64 as _b64
 _fs = O + 'fruit-slash.html'; _s = open(_fs, encoding='utf-8').read()
 _dir = os.path.join(ROOT, 'tools', 'fruit-slash-cats')
-for _f in sorted(os.listdir(_dir)):
+for _f in sorted(f for f in os.listdir(_dir) if f.endswith('.webp')):
     _k = _f.rsplit('.', 1)[0]
     _new = _b64.b64encode(open(os.path.join(_dir, _f), 'rb').read()).decode()
     _s, _n = _re.subn('"%s": "data:image/webp;base64,[A-Za-z0-9+/=]+"' % _k, lambda m: '"%s": "data:image/webp;base64,%s"' % (_k, _new), _s)

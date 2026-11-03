@@ -170,7 +170,7 @@ window.GAMES = [
     id: "fruit-slash",
     title: "Fruit Slash",
     file: "games/fruit-slash.html",
-    thumb: "thumbs/fruit-slash.jpg",
+    thumb: "thumbs/fruit-slash.jpg?v=42",
     cost: 1,
     tag: "NEW",
     color: "#3fbf5a",
