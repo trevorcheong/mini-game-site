@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=45"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=46"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -219,6 +219,25 @@ patch('sword-in-stone.html', '/* fill the whole frame (the game was capped at 48
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ('preload(() => {}).then(() => {',
    '/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(ensureAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { game, onSuccess, onFail, onWin, showResult, layout };\npreload(() => {}).then(() => {'),
+])
+
+# 13 Ghost Hunt: drag to move a flashlight, catch ghosts (+RM0.10, golden +RM0.20), bats cost 3 s. 30 s round,
+#   RM2.00 ends it early. Time up: cents>0 -> voucher (MGS.win), nothing caught -> MGS.gameOver. IIFE -> test hook MGS_TEST.
+#   Images were separate files in the artifact and are embedded as data URIs.
+patch('ghost-hunt.html', '/* fill the whole frame (the game was capped at 480px wide) */\n#game{max-width:none!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}', [
+  # never open the game\'s own claim URL (the site takes over #claimBtn)
+  ('const CLAIM_URL = "https://example.com/claim";', 'const CLAIM_URL = "";'),
+  # report the result to the site; the result card scales to fit short phones
+  ('  $("#result").classList.add("show");\n}',
+   '  $("#result").classList.add("show");\n  fitResult();\n  if (cents > 0) MGS.win({ amount: cents / 100, code: voucher, label: rm(cents) }); else MGS.gameOver();\n}\n'
+   'function fitResult(){ const el = $("#result .card"); el.style.transform = ""; const k = Math.min(1, (innerHeight - 48) / el.offsetHeight, (innerWidth - 24) / el.offsetWidth); if (k < 1) { el.style.transformOrigin = "50% 50%"; el.style.transform = "scale(" + k.toFixed(3) + ")"; } }\n'
+   'window.addEventListener("resize", () => { if ($("#result").classList.contains("show")) fitResult(); });'),
+  # play again after a win or a loss costs TOKEN
+  ('$("#againBtn").addEventListener("click", startRound);', '$("#againBtn").addEventListener("click", MGS.paid(startRound));'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('requestAnimationFrame(loop);\n})();',
+   'requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startRound);\n'
+   'window.MGS_TEST = { startRound, endRound, showResult, catchGhost, get state(){ return state; }, get cents(){ return cents; }, set cents(v){ cents = v; updateHud(false); }, get elapsed(){ return elapsed; }, set elapsed(v){ elapsed = v; }, get entities(){ return entities; }, light };\n})();'),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

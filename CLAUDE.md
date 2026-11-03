@@ -59,8 +59,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 12 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone.
+- 13 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -173,6 +173,9 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     `MGS_TEST.game.pulls=19; MGS_TEST.onSuccess()` = RM2.00 win, `MGS_TEST.game.pulls=0; MGS_TEST.onFail()` = loss.
     Its images were separate files in the artifact and are embedded as data URIs. Result card scales to fit (`fitResult`).
     Owner asked for 20% harder: green zone starts at 0.352 (min 0.072), gem speed 0.744 (max 2.4).
+  - Ghost Hunt: IIFE → drag the mouse to move the flashlight onto a ghost (`MGS_TEST.entities`, `MGS_TEST.light`);
+    `MGS_TEST.cents=70; MGS_TEST.elapsed=40` = time up with RM0.70 voucher, `MGS_TEST.cents=0; MGS_TEST.elapsed=40` = loss.
+    Its own CLAIM_URL is blanked; images embedded as data URIs. Result card scales to fit (`fitResult`, uses innerHeight).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

@@ -195,5 +195,20 @@ window.GAMES = [
       "The zone gets smaller and the gem gets faster.",
       "Miss once and it's over. You keep what you won, up to RM2.00."
     ]
+  },
+  {
+    id: "ghost-hunt",
+    title: "Ghost Hunt",
+    file: "games/ghost-hunt.html",
+    thumb: "thumbs/ghost-hunt.jpg?v=46",
+    cost: 1,
+    tag: "NEW",
+    color: "#8a5cff",
+    howTo: [
+      "Drag anywhere to move the flashlight.",
+      "Hold the light on a ghost to catch it: +RM0.10. A lucky golden ghost is +RM0.20.",
+      "Keep the light off the bats, or you lose 3 seconds.",
+      "You have 30 seconds. You keep what you won, up to RM2.00."
+    ]
   }
 ];
