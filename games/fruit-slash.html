@@ -1,9 +1,18 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=38"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=39"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame */
 #stage{width:100%!important;box-shadow:none!important}
 /* owner: no white focus frame on buttons */
 .btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible,.icon-btn:focus-visible{outline:none!important}
+/* owner: bigger cat on the win card, centred, not covered by the ticket */
+.endCat{height:clamp(150px,32vh,250px)!important;margin:0 auto 10px!important;max-width:100%}
+#endScreen .panel{gap:10px!important}
+#endScreen .reason{font-size:26px}
+#endScreen .t-top{padding:14px 18px 10px}
+#endScreen .t-amount{font-size:48px}
+#endScreen .t-bot{padding:10px 16px 12px;gap:6px}
+#endScreen #copyMsg{min-height:0}
+#endScreen .btn{padding:11px 20px;font-size:21px}
 </style>
 </head><body>
 <title>Fruit Slash</title>
