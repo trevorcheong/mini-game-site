@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=47"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=48"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -227,6 +227,10 @@ patch('sword-in-stone.html', '/* fill the whole frame (the game was capped at 48
 patch('ghost-hunt.html', '/* fill the whole frame (the game was capped at 480px wide) */\n#game{max-width:none!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}', [
   # never open the game\'s own claim URL (the site takes over #claimBtn)
   ('const CLAIM_URL = "https://example.com/claim";', 'const CLAIM_URL = "";'),
+  # bug fix: the result line was rebuilt without id="resAmt", so from the 2nd round on showResult() threw
+  # and the result card never appeared after time ran out
+  ('`You won <span>${rm(cents)}</span>!`', '`You won <span id="resAmt">${rm(cents)}</span>!`'),
+  ('  $("#resAmt").textContent = rm(cents);\n', ''),
   # report the result to the site; the result card scales to fit short phones
   ('  $("#result").classList.add("show");\n}',
    '  $("#result").classList.add("show");\n  fitResult();\n  if (cents > 0) MGS.win({ amount: cents / 100, code: voucher, label: rm(cents) }); else MGS.gameOver();\n}\n'

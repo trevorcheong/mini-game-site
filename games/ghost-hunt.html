@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=47"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=48"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame (the game was capped at 480px wide) */
 #game{max-width:none!important;box-shadow:none!important}
@@ -912,8 +912,7 @@ function showResult(won) {
   state = "over";
   voucher = cents > 0 ? makeCode() : "";
   $("#resHead").textContent = won ? "Perfect Hunt!" : "Time's Up!";
-  $("#resAmt").textContent = rm(cents);
-  $("#resWon").innerHTML = cents > 0 ? `You won <span>${rm(cents)}</span>!` : "No ghosts caught!";
+  $("#resWon").innerHTML = cents > 0 ? `You won <span id="resAmt">${rm(cents)}</span>!` : "No ghosts caught!";
   $("#resSub").textContent = cents > 0 ? `You found ${found} ghost${found === 1 ? "" : "s"}` : "Sweep the light slowly and tap them fast.";
   $("#claimArea").classList.toggle("hidden", cents <= 0);
   $("#codeTxt").textContent = voucher;

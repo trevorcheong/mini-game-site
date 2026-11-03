@@ -176,6 +176,8 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
   - Ghost Hunt: IIFE → drag the mouse to move the flashlight onto a ghost (`MGS_TEST.entities`, `MGS_TEST.light`);
     `MGS_TEST.cents=70; MGS_TEST.elapsed=40` = time up with RM0.70 voucher, `MGS_TEST.cents=0; MGS_TEST.elapsed=40` = loss.
     Its own CLAIM_URL is blanked; images embedded as data URIs. Result card scales to fit (`fitResult`, uses innerHeight).
+    Fixed: the original rebuilt the result line without `id="resAmt"`, so from round 2 the result never showed;
+    test several rounds in a row (paid replay between them).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
