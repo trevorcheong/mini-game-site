@@ -200,7 +200,7 @@ window.GAMES = [
     id: "ghost-hunt",
     title: "Ghost Hunt",
     file: "games/ghost-hunt.html",
-    thumb: "thumbs/ghost-hunt.jpg?v=46",
+    thumb: "thumbs/ghost-hunt.jpg?v=47",
     cost: 1,
     tag: "NEW",
     color: "#8a5cff",
