@@ -8,15 +8,18 @@ Pure static site with no build step: plain HTML/CSS/JS, hosted on GitHub Pages.
 - Repo: trevorcheong/mini-game-site, branch `main`. Pages deploys from `main` / root.
 - Owner's local copy: `E:\CLAUDE\MINI GAME SIDE` (Windows). Keep it identical to the repo.
 - The owner writes in Chinese. Reply in Chinese unless they write in English.
-- Player-facing UI text is English, to match the games.
+- Player-facing UI text: the site shell has English (default) and Chinese (`assets/i18n.js`, lobby EN/中文 switch,
+  remembered in localStorage `mgs.lang`, or `?lang=zh|en`). Games inside the iframe stay English.
+  Any new shell text goes through `I18N.t(key)` with both `en` and `zh` entries; every game needs `howTo_zh`.
 
 ## Layout
 
 ```
-index.html            Lobby: game grid, search, TOKEN pill, player name, My Vouchers bar
+index.html            Lobby: game grid, search, A–Z sort (localStorage `mgs.sortAZ`), EN/中文 switch, TOKEN pill, player name, My Vouchers bar
 play.html             Game page (play.html?game=<id>): pay-to-start card, game iframe, header
-games.config.js       ★ List of games (id, title, file, thumb, cost, tag, color, howTo)
+games.config.js       ★ List of games (id, title, file, thumb, cost, tag, color, howTo, howTo_zh)
 assets/style.css      Shared styles (dark theme, cards, modals, voucher bar, notices)
+assets/i18n.js        Shell translations (en/zh), I18N.t / I18N.howTo / I18N.apply (data-i18n* attributes)
 assets/common.js      Shared UI: modal, toast, top notice, token pill, player chip,
                       My Vouchers bar/list, copy button, claimVoucher()
 assets/token.js       TokenService: balance, spend, player token/name (demo = localStorage)
@@ -109,7 +112,7 @@ Do not treat the site as production-safe until these exist.
      (if the game's code is wrapped in an IIFE, put the start call inside it with a replacement instead —
      see the Golden Goal entry)
 3. Run `python3 tools/patch_games.py`.
-4. Add the game to `games.config.js`.
+4. Add the game to `games.config.js` (with `howTo` and a Chinese `howTo_zh`).
 5. Test win, loss, paid replay, and claim (see Testing).
 
 ## Editing rules

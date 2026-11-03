@@ -1,6 +1,7 @@
 /* 大厅和游戏页共用的小工具 */
 (function () {
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const T = (k, v) => (window.I18N ? I18N.t(k, v) : k);
   const initials = (t) => t.split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
 
   const ICON = {
@@ -30,13 +31,14 @@
     const render = () => {
       const name = TokenService.playerName();
       chip.title = name;
-      chip.setAttribute("aria-label", "Player: " + name);
+      chip.setAttribute("aria-label", T("playerToast", { n: name }));
       chip.innerHTML = `<span class="p-ava">${esc((name.trim()[0] || "G").toUpperCase())}</span>
-        <span class="p-txt"><small>PLAYER</small><b>${esc(name)}</b></span>`;
+        <span class="p-txt"><small>${T("player")}</small><b>${esc(name)}</b></span>`;
     };
     render();
     TokenService.onChange(render);
-    chip.onclick = () => toast("Player: " + TokenService.playerName());
+    chip.onclick = () => toast(T("playerToast", { n: TokenService.playerName() }));
+    if (window.I18N) I18N.onChange(render);
   }
 
   function bindTokenPill() {
@@ -101,12 +103,12 @@
     m.innerHTML = `
       <div class="modal-bg" data-close></div>
       <div class="modal-box">
-        <button class="modal-close" data-close aria-label="Close">${ICON.close}</button>
+        <button class="modal-close" data-close aria-label="${T("close")}">${ICON.close}</button>
         <div class="modal-head">${head}
           <div><h3>${esc(g.title)}</h3>
-          <p>${subtitle || `<span class="coin sm">T</span> ${g.cost} TOKEN per play`}</p></div>
+          <p>${subtitle || `<span class="coin sm">T</span> ${T("perPlay", { n: g.cost })}`}</p></div>
         </div>
-        ${body != null ? body : `<ul class="howto">${(g.howTo || []).map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`}
+        ${body != null ? body : `<ul class="howto">${(window.I18N ? I18N.howTo(g) : g.howTo || []).map((s) => `<li>${esc(s)}</li>`).join("")}</ul>`}
         <div class="modal-foot">${actions.map((a, i) => `<button class="btn ${a.cls || "btn-ghost"}" data-act="${i}" ${a.disabled ? "disabled" : ""}>${a.label}</button>`).join("")}</div>
       </div>`;
     m.querySelectorAll("[data-close]").forEach((el) => (el.onclick = closeModal));
@@ -127,9 +129,9 @@
   const TICKET_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z"/><path d="M14 6v12" stroke-dasharray="2 2.2"/></svg>';
   const timeAgo = (t) => {
     const s = Math.round((Date.now() - t) / 1000);
-    if (s < 60) return "just now";
-    if (s < 3600) return Math.floor(s / 60) + "m ago";
-    if (s < 86400) return Math.floor(s / 3600) + "h ago";
+    if (s < 60) return T("justNow");
+    if (s < 3600) return T("mAgo", { n: Math.floor(s / 60) });
+    if (s < 86400) return T("hAgo", { n: Math.floor(s / 3600) });
     return new Date(t).toLocaleDateString();
   };
 
@@ -157,12 +159,12 @@
       e.stopPropagation();
       const code = b.dataset.copy;
       copyText(code).then(() => {
-        toast("Copied: " + code);
+        toast(T("copiedToast", { c: code }));
         const ico = b.querySelector(".cp-ico");
         const lbl = b.querySelector(".cp-lbl");
-        if (ico) { ico.innerHTML = CHECK_ICO; if (lbl) lbl.textContent = "COPIED"; b.classList.add("copied"); clearTimeout(b._t);
-          b._t = setTimeout(() => { ico.innerHTML = COPY_ICO; if (lbl) lbl.textContent = "COPY"; b.classList.remove("copied"); }, 1600); }
-      }, () => toast("Code: " + code + " (copy manually)"));
+        if (ico) { ico.innerHTML = CHECK_ICO; if (lbl) lbl.textContent = T("copied"); b.classList.add("copied"); clearTimeout(b._t);
+          b._t = setTimeout(() => { ico.innerHTML = COPY_ICO; if (lbl) lbl.textContent = T("copy"); b.classList.remove("copied"); }, 1600); }
+      }, () => toast(T("copyManual", { c: code })));
     }));
   }
 
@@ -171,20 +173,20 @@
     if (!v) return;
     // 会跳到合作方网站：游戏玩到一半时先提醒 TOKEN 不退还（play.html 提供 mgsConfirmLeave）
     if (VoucherService.canClaim()) {
-      const go = () => { if (VoucherService.claim(v)) toast("Taking you to claim " + v.label + "…"); };
+      const go = () => { if (VoucherService.claim(v)) toast(T("claimGoing", { v: v.label })); };
       if (window.mgsConfirmLeave) window.mgsConfirmLeave(go); else go();
       return;
     }
     openModal(
-      { title: "Claim " + v.label, icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
+      { title: T("claimTitle", { v: v.label }), icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
       {
-        subtitle: esc(v.gameTitle || "Voucher"),
+        subtitle: esc(v.gameTitle || T("voucher")),
         body: `<div class="claim-box">
-            <p>Your voucher is saved in <b>My Vouchers</b>. Use this code on the partner site to claim it.</p>
+            <p>${T("claimBody")}</p>
             <div class="claim-code"><code>${esc(v.code || "—")}</code>
-              ${v.code ? `<button class="copy-btn" type="button" data-copy="${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}</div>
+              ${v.code ? `<button class="copy-btn" type="button" data-copy="${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">${T("copy")}</span></button>` : ""}</div>
           </div>`,
-        actions: [{ label: "Done", cls: "btn-gold", onClick: closeModal }]
+        actions: [{ label: T("done"), cls: "btn-gold", onClick: closeModal }]
       }
     );
     bindCopy(document.getElementById("modal"));
@@ -200,19 +202,19 @@
           <div class="vrow-amt">${gameOf(v.gameId).thumb ? `<img src="${esc(gameOf(v.gameId).thumb)}" alt="">` : ""}<span>${esc(v.label)}</span></div>
           <div class="vrow-info"><b>${esc(v.gameTitle || "")}</b>${v.code ? `<code>${esc(v.code)}</code>` : ""}<span>${timeAgo(v.at)}</span></div>
           <div class="vrow-act">
-            ${v.code ? `<button class="copy-btn sm" type="button" data-copy="${esc(v.code)}" aria-label="Copy voucher code ${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}
+            ${v.code ? `<button class="copy-btn sm" type="button" data-copy="${esc(v.code)}" aria-label="${esc(T("copyAria", { c: v.code }))}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">${T("copy")}</span></button>` : ""}
             ${v.claimed
-              ? `<span class="claimed-tag">CLAIMED</span>`
-              : canClaim ? `<button class="claim-btn" type="button" data-claim="${esc(v.id)}">CLAIM</button>` : ""}
+              ? `<span class="claimed-tag">${T("claimed")}</span>`
+              : canClaim ? `<button class="claim-btn" type="button" data-claim="${esc(v.id)}">${T("claim")}</button>` : ""}
           </div>
         </li>`).join("")
-      : `<li class="vempty">No vouchers yet. Win one in any game!</li>`;
+      : `<li class="vempty">${T("vEmpty")}</li>`;
     openModal(
-      { title: "My Vouchers", icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
+      { title: T("myVouchers"), icon: `<div class="vbig-ico">${TICKET_ICO}</div>` },
       {
-        subtitle: `${list.length} voucher${list.length === 1 ? "" : "s"} · Total <b class="gold">${fmt(VoucherService.total())}</b>`,
+        subtitle: T("vCount", { n: list.length, s: list.length === 1 ? "" : "s", t: fmt(VoucherService.total()) }),
         body: `<ul class="vlist">${rows}</ul>`,
-        actions: [{ label: "Close", onClick: closeModal }]
+        actions: [{ label: T("close"), onClick: closeModal }]
       }
     );
     const m = document.getElementById("modal");
@@ -223,21 +225,26 @@
   /** 在 el 里放 My Vouchers 栏。hideEmpty=true 时没有 voucher 就隐藏 */
   function mountVoucherBar(el, { hideEmpty = false } = {}) {
     el.classList.add("vbar");
-    el.innerHTML = `
+    const build = () => { el.innerHTML = `
       <div class="vbar-in">
-        <button class="vbar-sum" type="button" aria-label="View all vouchers">
+        <button class="vbar-sum" type="button" aria-label="${T("viewAllAria")}">
           <span class="vbar-ico">${TICKET_ICO}</span>
-          <span class="vbar-txt"><small>MY VOUCHERS</small><b><span data-total>RM0.00</span><i data-count>0</i></b></span>
+          <span class="vbar-txt"><small>${T("myVouchersCaps")}</small><b><span data-total>RM0.00</span><i data-count>0</i></b></span>
         </button>
         <div class="vchips" data-chips></div>
-        <button class="vbar-all" type="button">View all</button>
+        <button class="vbar-all" type="button">${T("viewAll")}</button>
       </div>`;
-    const chips = el.querySelector("[data-chips]");
-    el.querySelector(".vbar-sum").onclick = openVoucherList;
-    el.querySelector(".vbar-all").onclick = openVoucherList;
-    chips.onclick = (e) => { if (e.target.closest(".vchip-main")) openVoucherList(); };
+      el.querySelector(".vbar-sum").onclick = openVoucherList;
+      el.querySelector(".vbar-all").onclick = openVoucherList;
+      el.querySelector("[data-chips]").onclick = (e) => { if (e.target.closest(".vchip-main")) openVoucherList(); };
+    };
+    build();
+    // 换语言：重画整条（文字都在里面）
+    if (window.I18N) I18N.onChange(() => { build(); paint(VoucherService.list(), null); });
 
-    VoucherService.onChange((list, added) => {
+    VoucherService.onChange(paint);
+    function paint(list, added) {
+      const chips = el.querySelector("[data-chips]");
       el.classList.toggle("hidden", hideEmpty && !list.length);
       el.querySelector("[data-total]").textContent = VoucherService.fmt(VoucherService.total());
       el.querySelector("[data-count]").textContent = list.length;
@@ -248,15 +255,15 @@
               ${gameOf(v.gameId).thumb ? `<img class="vchip-ico" src="${esc(gameOf(v.gameId).thumb)}" alt="">` : `<span class="vchip-ico ph-ico">${TICKET_ICO}</span>`}
               <span class="vchip-txt"><b>${esc(v.label)}</b><span>${esc(v.gameTitle || "")}</span></span>
             </button>
-            ${v.code ? `<button class="copy-btn sm" type="button" data-copy="${esc(v.code)}" title="Copy ${esc(v.code)}" aria-label="Copy voucher code ${esc(v.code)}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">COPY</span></button>` : ""}
+            ${v.code ? `<button class="copy-btn sm" type="button" data-copy="${esc(v.code)}" title="${esc(T("copyAria", { c: v.code }))}" aria-label="${esc(T("copyAria", { c: v.code }))}"><span class="cp-ico">${COPY_ICO}</span><span class="cp-lbl">${T("copy")}</span></button>` : ""}
           </div>`).join("")
-        : `<span class="vchips-empty">Win a game to collect vouchers here</span>`;
+        : `<span class="vchips-empty">${T("vChipsEmpty")}</span>`;
       bindCopy(chips);
       if (added) {
         chips.scrollTo({ left: 0, behavior: "smooth" });
         el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
       }
-    });
+    }
   }
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 

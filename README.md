@@ -74,3 +74,12 @@ retryBtn.onclick = MGS.paid(restartGame);                   // 输后/赢后重�
 
 ## Voucher 存放
 `assets/voucher.js` —— 演示模式存在浏览器；填 `CLAIM_URL` 后 My Vouchers 弹窗会出现 “Claim on partner site” 按钮。
+
+## 语言（中文 / English）
+- 大厅右上角的 **EN / 中文** 切换网站外框的语言（大厅、开始卡片、提醒弹窗、我的现金券）。游戏本身还是英文。
+- 玩家选的语言会记住。合作方也可以在链接带 `?lang=zh` 或 `?lang=en` 直接指定。
+- 所有文字在 `assets/i18n.js`；游戏玩法的中文在 `games.config.js` 每个游戏的 `howTo_zh`。
+- 新增游戏时记得也写 `howTo_zh`（没有的话中文模式会显示英文玩法）。
+
+## 游戏排序
+- 游戏列表旁的 **A–Z** 按钮：按游戏名字母排序，再按一次回到原本顺序。玩家的选择会记住。

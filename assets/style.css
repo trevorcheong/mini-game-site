@@ -337,3 +337,31 @@ img{display:block;max-width:100%}
 .claim-code{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:10px 10px 10px 14px;border-radius:12px;
   background:rgba(255,200,61,.08);border:1px dashed rgba(255,200,61,.45)}
 .claim-code code{font:700 16px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;color:var(--gold);overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- language switch + A–Z sort (lobby) ---------- */
+.tb-left{display:flex;align-items:center;gap:12px;min-width:0}
+.lang-sw{display:flex;flex:none;padding:3px;border-radius:999px;background:var(--bg-2);border:1px solid var(--line)}
+.lang-sw button{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
+  padding:6px 10px;border-radius:999px;cursor:pointer;line-height:1;transition:background .15s,color .15s}
+.lang-sw button.on{background:linear-gradient(180deg,#8f73ff,#6a4bff);color:#fff;box-shadow:0 2px 8px rgba(106,75,255,.45)}
+.tools{display:flex;align-items:center;gap:8px;min-width:0}
+.sort-btn{appearance:none;display:flex;align-items:center;gap:4px;height:38px;padding:0 11px;border-radius:12px;flex:none;cursor:pointer;
+  background:var(--bg-2);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:13.5px;font-weight:700}
+.sort-btn svg{width:15px;height:15px}
+.sort-btn.on{color:#fff;border-color:rgba(124,92,255,.7);background:rgba(124,92,255,.22)}
+@media(max-width:430px){
+  .search{width:min(200px,40vw)}
+  .toolbar h2{font-size:14px}
+  .lang-sw button{padding:6px 8px;font-size:12px}
+}
+.toolbar h2{white-space:nowrap}
+/* very narrow phones: player chip shows only the avatar so the language switch fits */
+@media(max-width:380px){
+  .p-txt{display:none}
+  .player-chip{padding:4px}
+  .tb-left{gap:8px}
+  .toolbar{gap:8px}
+  .toolbar h2{font-size:13px}
+  .search{width:min(150px,36vw);padding:0 10px}
+  .sort-btn{padding:0 9px}
+}
