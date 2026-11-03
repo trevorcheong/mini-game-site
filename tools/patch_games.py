@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=39"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=40"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -178,7 +178,7 @@ patch('stack-stack-win.html', '/* fill the whole frame (the game was a 9:16 phon
 
 # 11 Fruit Slash: swipe to slice (three.js r128 from games/vendor). Every 3 fruits RM0.10, golden fruit / combo +RM0.10,
 #   up to RM2.00. Bomb or 3 dropped fruits ends it: cents>0 -> MGS.win, else MGS.gameOver. Keeps its own 3-2-1-SLICE countdown.
-patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible,.icon-btn:focus-visible{outline:none!important}\n/* owner: bigger cat on the win card, centred, not covered by the ticket */\n.endCat{height:clamp(150px,32vh,250px)!important;margin:0 auto 10px!important;max-width:100%}\n#endScreen .panel{gap:10px!important}\n#endScreen .reason{font-size:26px}\n#endScreen .t-top{padding:14px 18px 10px}\n#endScreen .t-amount{font-size:48px}\n#endScreen .t-bot{padding:10px 16px 12px;gap:6px}\n#endScreen #copyMsg{min-height:0}\n#endScreen .btn{padding:11px 20px;font-size:21px}', [
+patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible,.icon-btn:focus-visible{outline:none!important}\n/* owner: bigger cat on the win card, centred, not covered by the ticket */\n.endCat{height:clamp(150px,32vh,250px)!important;margin:0 auto 10px!important;max-width:100%}\n#endScreen .panel{gap:10px!important}\n#endScreen .reason{font-size:26px}\n#endScreen .t-top{padding:14px 18px 10px}\n#endScreen .t-amount{font-size:48px}\n#endScreen .t-bot{padding:10px 16px 12px;gap:6px}\n#endScreen #copyMsg{min-height:0}\n#endScreen .btn{padding:11px 20px;font-size:21px}\n/* owner: no expiry line on the ticket */\n#vMeta{display:none!important}', [
   # three.js from our own server instead of the CDN
   ('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>',
    '<script src="vendor/three-r128.min.js"></script>'),
@@ -188,12 +188,26 @@ patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!importa
   ('function voucherCode(){',
    'function fitEnd(){ const el = document.querySelector("#endScreen .panel"); el.style.transform = ""; const k = Math.min(1, (stage.clientHeight - 24) / el.offsetHeight); if (k < 1){ el.style.transformOrigin = "50% 50%"; el.style.transform = "scale(" + k.toFixed(3) + ")"; } }\nwindow.addEventListener("resize", () => { if (!$("endScreen").hidden) fitEnd(); });\nfunction voucherCode(){'),
   # play again after a win or a loss costs TOKEN
+  # owner: plain gold coins in the win rain (no "RM" printed on them)
+  ('if (sx > .5){ fctx.fillStyle = "#8a5600"; fctx.font = `900 ${p.r*.8}px Nunito, sans-serif`; fctx.textAlign = "center"; fctx.textBaseline = "middle"; fctx.fillText("RM",0,1); }', ''),
   ('$("replayBtn").addEventListener("click", startGame);',
    '$("replayBtn").addEventListener("click", MGS.paid(startGame));'),
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ('resize(); refreshPlays(); requestAnimationFrame(frame);',
    'resize(); refreshPlays(); requestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { get state(){ return state; }, get cents(){ return cents; }, get misses(){ return misses; }, get objs(){ return objs; },\n  end(c, reason){ cents = c; cuts = Math.floor(c / 10) * 3; endReason = reason || "bomb"; showResult(); } };'),
 ])
+
+# Fruit Slash: swap in the cleaned cat poses from tools/fruit-slash-cats/*.webp
+# (the originals had white leftovers, e.g. a white patch behind the head in the cheer poses)
+import re as _re, base64 as _b64
+_fs = O + 'fruit-slash.html'; _s = open(_fs, encoding='utf-8').read()
+_dir = os.path.join(ROOT, 'tools', 'fruit-slash-cats')
+for _f in sorted(os.listdir(_dir)):
+    _k = _f.rsplit('.', 1)[0]
+    _new = _b64.b64encode(open(os.path.join(_dir, _f), 'rb').read()).decode()
+    _s, _n = _re.subn('"%s": "data:image/webp;base64,[A-Za-z0-9+/=]+"' % _k, lambda m: '"%s": "data:image/webp;base64,%s"' % (_k, _new), _s)
+    assert _n == 1, (_k, _n)
+open(_fs, 'w', encoding='utf-8').write(_s); print('cats', 'fruit-slash.html')
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----
 BOOT = {

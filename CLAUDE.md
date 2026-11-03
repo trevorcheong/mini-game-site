@@ -26,6 +26,7 @@ games/mgs-bridge.js   Bridge loaded by every game: win / gameOver / paid replay 
 games/vendor/         Libraries games load locally instead of from a CDN (three-r128.min.js for Stack Stack Win, Fruit Slash)
 games_original_backup/  Untouched original games — never edit
 tools/patch_games.py  Rebuilds games/*.html from the originals (all game changes live here)
+tools/fruit-slash-cats/  Cleaned Fruit Slash cat poses (white leftovers removed); patch_games.py embeds them
 thumbs/*.jpg          512px square thumbnails (generated with Magnific)
 README.md             Owner-facing guide in Chinese (adding games, API, claim parameters)
 ```
