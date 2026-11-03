@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=37"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=38"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -174,6 +174,25 @@ patch('stack-stack-win.html', '/* fill the whole frame (the game was a 9:16 phon
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ('requestAnimationFrame(loop);\n})();',
    'requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(function(){ try{ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); actx.resume && actx.resume(); }catch(e){} });\nMGS.boot(start);\nwindow.MGS_TEST = { win, lose, drop, showResult, get placed(){ return placed; }, set placed(v){ placed = v; updateHud(); }, get state(){ return state; }, get cur(){ return cur; }, get top(){ return stack[stack.length-1]; } };\n})();'),
+])
+
+# 11 Fruit Slash: swipe to slice (three.js r128 from games/vendor). Every 3 fruits RM0.10, golden fruit / combo +RM0.10,
+#   up to RM2.00. Bomb or 3 dropped fruits ends it: cents>0 -> MGS.win, else MGS.gameOver. Keeps its own 3-2-1-SLICE countdown.
+patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible,.icon-btn:focus-visible{outline:none!important}', [
+  # three.js from our own server instead of the CDN
+  ('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>',
+   '<script src="vendor/three-r128.min.js"></script>'),
+  # report the result to the site; the result panel scales to fit short phones
+  ('  $("hud").hidden = true; $("endScreen").hidden = false; refreshPlays();',
+   '  $("hud").hidden = true; $("endScreen").hidden = false; refreshPlays();\n  fitEnd();\n  if (won) MGS.win({ amount: cents / 100, code: $("vCode").textContent, label: "RM" + fmt(cents) }); else MGS.gameOver();'),
+  ('function voucherCode(){',
+   'function fitEnd(){ const el = document.querySelector("#endScreen .panel"); el.style.transform = ""; const k = Math.min(1, (stage.clientHeight - 24) / el.offsetHeight); if (k < 1){ el.style.transformOrigin = "50% 50%"; el.style.transform = "scale(" + k.toFixed(3) + ")"; } }\nwindow.addEventListener("resize", () => { if (!$("endScreen").hidden) fitEnd(); });\nfunction voucherCode(){'),
+  # play again after a win or a loss costs TOKEN
+  ('$("replayBtn").addEventListener("click", startGame);',
+   '$("replayBtn").addEventListener("click", MGS.paid(startGame));'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('resize(); refreshPlays(); requestAnimationFrame(frame);',
+   'resize(); refreshPlays(); requestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\nwindow.MGS_TEST = { get state(){ return state; }, get cents(){ return cents; }, get misses(){ return misses; }, get objs(){ return objs; },\n  end(c, reason){ cents = c; cuts = Math.floor(c / 10) * 3; endReason = reason || "bomb"; showResult(); } };'),
 ])
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----

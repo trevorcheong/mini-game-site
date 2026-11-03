@@ -165,5 +165,20 @@ window.GAMES = [
       "Reach layer 20 to win the full RM2.00. Blocks get faster as you go up.",
       "Miss and the game ends, and you keep what you stacked."
     ]
+  },
+  {
+    id: "fruit-slash",
+    title: "Fruit Slash",
+    file: "games/fruit-slash.html",
+    thumb: "thumbs/fruit-slash.jpg",
+    cost: 1,
+    tag: "NEW",
+    color: "#3fbf5a",
+    howTo: [
+      "Swipe to slice the fruits. Every 3 fruits adds RM0.10.",
+      "Golden fruit adds RM0.10 instantly.",
+      "Slice 3 or more in one swipe for a combo bonus.",
+      "Hit a bomb or drop 3 fruits and it's over. You keep what you won, up to RM2.00."
+    ]
   }
 ];

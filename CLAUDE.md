@@ -23,7 +23,7 @@ assets/token.js       TokenService: balance, spend, player token/name (demo = lo
 assets/voucher.js     VoucherService: won vouchers + claim interface (demo = localStorage)
 games/*.html          Self-contained games (big files, base64 assets inside), patched for the site
 games/mgs-bridge.js   Bridge loaded by every game: win / gameOver / paid replay / claim / audio unlock
-games/vendor/         Libraries games load locally instead of from a CDN (three-r128.min.js for Stack Stack Win)
+games/vendor/         Libraries games load locally instead of from a CDN (three-r128.min.js for Stack Stack Win, Fruit Slash)
 games_original_backup/  Untouched original games — never edit
 tools/patch_games.py  Rebuilds games/*.html from the originals (all game changes live here)
 thumbs/*.jpg          512px square thumbnails (generated with Magnific)
@@ -57,8 +57,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 10 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot, Flash Memory, Stack Stack Win.
+- 11 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -165,6 +165,8 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     drop when lined up: wait for `|MGS_TEST.cur[axis] - MGS_TEST.top[axis]| < .25`, then `MGS_TEST.drop()`;
     force a miss with `MGS_TEST.cur[axis]=5.4; MGS_TEST.drop()`; `MGS_TEST.placed=20; MGS_TEST.win()` = RM2.00.
     Its result card scales to fit (`fitResult`).
+  - Fruit Slash: IIFE + three.js → swipe with the mouse to slice; `MGS_TEST.end(70,'bomb')` = RM0.70 voucher,
+    `MGS_TEST.end(0,'miss')` = loss. Keeps its own 3-2-1-SLICE! countdown. Result panel scales to fit (`fitEnd`).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
