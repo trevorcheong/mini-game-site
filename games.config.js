@@ -294,7 +294,7 @@ window.GAMES = [
     id: "punch-rush",
     title: "Punch Rush",
     file: "games/punch-rush.html",
-    thumb: "thumbs/punch-rush.jpg?v=50",
+    thumb: "thumbs/punch-rush.jpg?v=51",
     cost: 1,
     tag: "NEW",
     color: "#d8232c",
