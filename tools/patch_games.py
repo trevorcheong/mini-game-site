@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=51"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=52"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -281,6 +281,28 @@ for _f in sorted(f for f in os.listdir(_dir) if f.endswith('.webp')):
     _s, _n = _re.subn('"%s": "data:image/webp;base64,[A-Za-z0-9+/=]+"' % _k, lambda m: '"%s": "data:image/webp;base64,%s"' % (_k, _new), _s)
     assert _n == 1, (_k, _n)
 open(_fs, 'w', encoding='utf-8').write(_s); print('cats', 'fruit-slash.html')
+
+# Sword in the Stone & Ghost Hunt: owner asked for the whole look re-rendered as 3D cartoon
+# (Pixar/Disney-style render) — every background, character/monster and prop, plus the
+# thumbnails. New art made in Magnific (images_generate for a seed render per game, then
+# images_restyle to carry that same 3D look onto every other asset, then images_remove_background
+# so sprites stay transparent). Files live in tools/sword-in-stone-3d/<key>.webp|jpg and
+# tools/ghost-hunt-3d/<key>.webp, keyed by the same names as the games' own ASSET_LIST/ASSETS.
+def _swap_assets(html_fn, asset_dir, quote):
+    _p = O + html_fn
+    _s = open(_p, encoding='utf-8').read()
+    for _f in sorted(os.listdir(os.path.join(ROOT, 'tools', asset_dir))):
+        _k = _f.rsplit('.', 1)[0]
+        _ext = 'jpeg' if _f.endswith(('.jpg', '.jpeg')) else 'webp'
+        _new = _b64.b64encode(open(os.path.join(ROOT, 'tools', asset_dir, _f), 'rb').read()).decode()
+        _pat = _re.escape(_k) + r':\s*' + quote + r'data:image/\w+;base64,[A-Za-z0-9+/=]+' + quote
+        _s, _n = _re.subn(_pat, lambda m, _e=_ext, _d=_new, _q=quote, _kk=_k: _kk + ':' + _q + 'data:image/' + _e + ';base64,' + _d + _q, _s, count=1)
+        assert _n == 1, (html_fn, _k, _n)
+    open(_p, 'w', encoding='utf-8').write(_s)
+    print('3d-art', html_fn)
+
+_swap_assets('sword-in-stone.html', 'sword-in-stone-3d', "'")
+_swap_assets('ghost-hunt.html', 'ghost-hunt-3d', '"')
 
 # ---- 去掉游戏内的开始页面：付了 TOKEN 直接开始 ----
 BOOT = {

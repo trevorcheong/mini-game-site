@@ -31,6 +31,12 @@ games_original_backup/  Untouched original games — never edit
 tools/patch_games.py  Rebuilds games/*.html from the originals (all game changes live here)
 tools/fruit-slash-cats/  Fruit Slash mascot poses (ninja panda, owner's choice — replaced the cat, whose art had white
                       edges). Made in Magnific on pure green, cut out with key_green.py.txt; patch_games.py embeds them
+tools/sword-in-stone-3d/, tools/ghost-hunt-3d/  Owner asked for these two games' whole look re-rendered as
+                      3D cartoon (Pixar/Disney-style render) — backgrounds, characters/monsters and props, keyed
+                      by the same names as each game's own ASSET_LIST/ASSETS object (bg, knight_idle, ghost_1, …).
+                      Made in Magnific: one seed image per game via images_generate, then images_restyle to carry
+                      that same 3D look onto every other asset, then images_remove_background so sprites stay
+                      transparent. patch_games.py's `_swap_assets()` embeds them by key, regardless of old format.
 thumbs/*.jpg          512px square thumbnails (generated with Magnific)
 README.md             Owner-facing guide in Chinese (adding games, API, claim parameters)
 ```
