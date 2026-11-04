@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=55"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=56"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -264,6 +264,14 @@ patch('punch-rush.html', '/* fill the whole frame (the game was capped at 520px 
    "window.addEventListener('resize',()=>{if(!$('result').classList.contains('hide'))fitCard()});\n/* ---------- voucher helpers ---------- */"),
   # play again after a win or a loss costs TOKEN
   ("bindBtn($('againBtn'),startCountdown);", "bindBtn($('againBtn'),MGS.paid(startCountdown));"),
+  # owner: a bomb and a must-punch enemy sharing a lane is an unavoidable hit —
+  # you can't risk a punch while the bomb is in reach, so an enemy right behind
+  # it always gets through. Keep bombs and enemies on separate lanes: if the
+  # chosen side already has the other kind unresolved, use the other lane, or
+  # (if that one's busy too) just wait for the next tick.
+  ("function spawner(dt){\n  spawnT-=dt;if(spawnT>0)return;\n  let side=Math.random()<.62?-lastSide:lastSide;\n  // don't stack too many on one side\n  const k=pickKind();spawn(side,k);lastSide=side;\n  if(t>CFG.pairFrom&&Math.random()<CFG.pairChance&&k!=='bomb'){\n    setTimeout(()=>{if(state==='play')spawn(-side,Math.random()<.5?'e1':'e2')},60+Math.random()*180);\n    spawnT=curGap()*1.35;\n  }else spawnT=curGap()*(0.8+Math.random()*.45);\n}",
+   "function laneBusy(side,wantBomb){return enemies.some(e=>!e.dead&&!e.passed&&e.side===side&&(wantBomb?e.kind!=='bomb':e.kind==='bomb'))}\n"
+   "function spawner(dt){\n  spawnT-=dt;if(spawnT>0)return;\n  let side=Math.random()<.62?-lastSide:lastSide;\n  // don't stack too many on one side\n  const k=pickKind();\n  if(laneBusy(side,k==='bomb')){\n    if(!laneBusy(-side,k==='bomb'))side=-side;else{spawnT=0.15;return}\n  }\n  spawn(side,k);lastSide=side;\n  if(t>CFG.pairFrom&&Math.random()<CFG.pairChance&&k!=='bomb'&&!laneBusy(-side,false)){\n    setTimeout(()=>{if(state==='play'&&!laneBusy(-side,false))spawn(-side,Math.random()<.5?'e1':'e2')},60+Math.random()*180);\n    spawnT=curGap()*1.35;\n  }else spawnT=curGap()*(0.8+Math.random()*.45);\n}"),
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ('window.PunchRush={CFG,start:startCountdown};',
    "window.PunchRush={CFG,start:startCountdown};\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audioInit);\nMGS.boot(startCountdown);\n"
