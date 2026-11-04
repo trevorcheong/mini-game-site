@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=56"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=57"></script>
 <style>/* MGS: mini game site */
 /* fill the whole frame (the game was capped at 480px wide) */
 #app{max-width:none!important}
@@ -536,10 +536,10 @@ function layout(){
   const barT = $('#barPanel').offsetTop || (H - 150);
   const top = Math.max(hudB + 10, H*.12), bottom = Math.min(barT, H*.86);
   const regionH = Math.max(bottom - top, 220);
-  const K = Math.min(W*.66, regionH*.6);              // knight: big, half-body; legs hidden behind the power bar
+  const K = Math.min(W*.6, regionH*.6);                // knight: off to the side
   const kTop = barT + K*.28 - K;
-  const S = Math.min(W*.6, regionH*.52);               // stone: centred, behind the knight
-  const cx = W*.5, stoneBottom = Math.min(kTop + S*.16, bottom - 4);
+  const S = Math.min(W*.82, regionH*.7);                // stone: bigger, the main focal point
+  const cx = W*.4, stoneBottom = Math.min(kTop + S*.16, bottom - 4);
   const stoneTop = stoneBottom - S, stoneLeft = cx - S/2;
   Object.assign(L, {W, H, S, cx, stoneTop});
   setBox(el.stone, stoneLeft, stoneTop, S, S);
@@ -553,7 +553,7 @@ function layout(){
   L.lift = (swordTop + sh*.97) - (stoneTop + S*.12);    // until the tip clears the slot
   el.swordClip.style.height = clipY + 'px';
   setBox(el.sword, stoneLeft + S*.5035 - sw/2, swordTop, sw, sh);
-  const kx = W*.5 - K/2, kBottom = barT + K*.28;
+  const kx = Math.min(W - K*.7, stoneLeft + S*.74), kBottom = barT + K*.28;
   setBox(el.knight, kx, kBottom - K, K, K);
   el.rays.style.left = cx + 'px'; el.rays.style.top = (stoneTop + S*.25) + 'px';
   L.knightCenter = {x: kx + K/2, y: kBottom - K*.72};
