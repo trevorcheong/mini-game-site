@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=49">
+<link rel="stylesheet" href="assets/style.css?v=50">
 </head>
 <body>
 
@@ -58,15 +58,15 @@
 </main>
 
 <footer class="foot">
-  <span data-i18n-html="footer">Play responsibly · T&amp;Cs apply</span> · <span style="opacity:.6">v49</span>
+  <span data-i18n-html="footer">Play responsibly · T&amp;Cs apply</span> · <span style="opacity:.6">v50</span>
   <span id="demoNote"></span>
 </footer>
 
-<script src="assets/i18n.js?v=49"></script>
-<script src="games.config.js?v=49"></script>
-<script src="assets/token.js?v=49"></script>
-<script src="assets/voucher.js?v=49"></script>
-<script src="assets/common.js?v=49"></script>
+<script src="assets/i18n.js?v=50"></script>
+<script src="games.config.js?v=50"></script>
+<script src="assets/token.js?v=50"></script>
+<script src="assets/voucher.js?v=50"></script>
+<script src="assets/common.js?v=50"></script>
 <script>
 (function () {
   const { esc, ICON, thumbImg, openModal } = UI;
@@ -81,7 +81,7 @@
 
   // 保留第三方带来的 ?token= 参数
   const qs = new URLSearchParams(location.search);
-  const playUrl = (id) => { const p = new URLSearchParams(qs); p.set("game", id); p.set("v", "49"); return "play.html?" + p.toString(); };
+  const playUrl = (id) => { const p = new URLSearchParams(qs); p.set("game", id); p.set("v", "50"); return "play.html?" + p.toString(); };
 
   function tagHTML(t) {
     if (!t) return "";

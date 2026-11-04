@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=49"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=50"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -242,6 +242,32 @@ patch('ghost-hunt.html', '/* fill the whole frame (the game was capped at 480px 
   ('requestAnimationFrame(loop);\n})();',
    'requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startRound);\n'
    'window.MGS_TEST = { startRound, endRound, showResult, catchGhost, get state(){ return state; }, get cents(){ return cents; }, set cents(v){ cents = v; updateHud(false); }, get elapsed(){ return elapsed; }, set elapsed(v){ elapsed = v; }, get entities(){ return entities; }, light };\n})();'),
+])
+
+# 14 Punch Rush: tap left / right half to punch enemies running in (+RM0.10, golden raccoon +RM0.20), don't punch
+#   bombs, 3 lives, up to RM2.00. Keeps its own 3-2-1-FIGHT! countdown. reward>0 -> MGS.win, else MGS.gameOver.
+#   IIFE -> test hook MGS_TEST. Images were separate files in the artifact and are embedded as data URIs.
+patch('punch-rush.html', '/* fill the whole frame (the game was capped at 520px wide) */\n#app{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}\n/* the site takes over CLAIM, so it is a button-looking link without href */\n#claimBtn{cursor:pointer}', [
+  # result card scales to fit short phones (fitCard sets --k), keeping its pop-in
+  ('@keyframes cin{to{transform:scale(1);opacity:1}}', '@keyframes cin{to{transform:scale(var(--k,1));opacity:1}}'),
+  # no free restart with Space / Enter on the result screen (every game is paid)
+  ("  else if((e.key===' '||e.key==='Enter')&&state!=='play'&&state!=='count'){audioInit();startCountdown()}\n", ''),
+  # CLAIM is always shown when a voucher is won; the site handles it (no ?return= link of the game's own)
+  ("const ret=returnUrl();const cb=$('claimBtn');", "const ret=null;const cb=$('claimBtn');"),
+  ('else cb.hidden=true;', "else{cb.hidden=false;cb.removeAttribute('href')}"),
+  # report the result to the site
+  ("  setTimeout(()=>{$('result').classList.remove('hide');const c=$('card');c.classList.remove('in');void c.offsetWidth;c.classList.add('in')},win?900:700);",
+   "  setTimeout(()=>{$('result').classList.remove('hide');const c=$('card');fitCard();c.classList.remove('in');void c.offsetWidth;c.classList.add('in')},win?900:700);\n"
+   "  if(r>0)MGS.win({amount:r,code:code,label:fmt(r)});else MGS.gameOver();"),
+  ('/* ---------- voucher helpers ---------- */',
+   "function fitCard(){const c=$('card');c.style.setProperty('--k',1);const k=Math.min(1,(innerHeight-40)/c.offsetHeight,(innerWidth-24)/c.offsetWidth);c.style.setProperty('--k',k.toFixed(3))}\n"
+   "window.addEventListener('resize',()=>{if(!$('result').classList.contains('hide'))fitCard()});\n/* ---------- voucher helpers ---------- */"),
+  # play again after a win or a loss costs TOKEN
+  ("bindBtn($('againBtn'),startCountdown);", "bindBtn($('againBtn'),MGS.paid(startCountdown));"),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('window.PunchRush={CFG,start:startCountdown};',
+   "window.PunchRush={CFG,start:startCountdown};\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audioInit);\nMGS.boot(startCountdown);\n"
+   "window.MGS_TEST={CFG,punch,endGame,hurt,get state(){return state},get reward(){return reward},set reward(v){reward=v;setMoney(false)},get lives(){return lives},get enemies(){return enemies}};"),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

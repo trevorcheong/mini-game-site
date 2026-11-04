@@ -289,5 +289,26 @@ window.GAMES = [
       "别照到蝙蝠，不然会扣 3 秒。",
       "你有 30 秒。已赢的归你，最多 RM2.00。"
     ]
+  },
+  {
+    id: "punch-rush",
+    title: "Punch Rush",
+    file: "games/punch-rush.html",
+    thumb: "thumbs/punch-rush.jpg?v=50",
+    cost: 1,
+    tag: "NEW",
+    color: "#d8232c",
+    howTo: [
+      "Tap the left or right half of the screen to punch that way.",
+      "Each knockout adds RM0.10. The golden raccoon adds RM0.20.",
+      "Don't punch the bombs. Let them roll past.",
+      "Punch too early and you miss. 3 lives. You keep what you won, up to RM2.00."
+    ],
+    howTo_zh: [
+      "点屏幕左边或右边，就往那边出拳。",
+      "每打倒一个敌人加 RM0.10，金色浣熊加 RM0.20。",
+      "别打炸弹，让它滚过去。",
+      "太早出拳会打空。有 3 条命。已赢的归你，最多 RM2.00。"
+    ]
   }
 ];

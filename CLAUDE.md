@@ -62,8 +62,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 13 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt.
+- 14 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -181,6 +181,11 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     Its own CLAIM_URL is blanked; images embedded as data URIs. Result card scales to fit (`fitResult`, uses innerHeight).
     Fixed: the original rebuilt the result line without `id="resAmt"`, so from round 2 the result never showed;
     test several rounds in a row (paid replay between them).
+  - Punch Rush: IIFE → click the left/right half when `MGS_TEST.enemies` has one within `CFG.reach` on that side;
+    `MGS_TEST.reward=0.7; MGS_TEST.endGame(false)` = RM0.70 voucher, `reward=0` = loss, `reward=2; endGame(true)` = max.
+    Waits for `MGS_TEST.state==='play'` after its own 3-2-1-FIGHT! countdown. Its Space/Enter restart and `?return=` claim
+    link are removed; CLAIM is always shown when a voucher is won. Again button uses mousedown/mouseup (bindBtn), not click.
+    Result card scales to fit (`fitCard`, `--k` in the `cin` keyframe).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);
