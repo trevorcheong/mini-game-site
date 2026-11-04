@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=60"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=61"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -199,7 +199,7 @@ patch('fruit-slash.html', '/* fill the whole frame */\n#stage{width:100%!importa
 
 # 12 Sword in the Stone: hold, release in the green zone. Each pull RM0.10, 20 pulls = RM2.00. One miss ends it:
 #   pulls>0 -> voucher (MGS.win), nothing pulled -> MGS.gameOver. IIFE -> test hook MGS_TEST. Images embedded as data URIs.
-patch('sword-in-stone.html', '/* fill the whole frame (the game was capped at 480px wide) */\n#app{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitResult sets --k / --dy), keeping its pop-in */\n#resultScreen .card{transform:translateY(calc(var(--dy,0px) + 30px)) scale(calc(var(--k,1) * .8))}\n#resultScreen.show .card{transform:translateY(var(--dy,0px)) scale(var(--k,1))}', [
+patch('sword-in-stone.html', '/* fill the whole frame (the game was capped at 480px wide) */\n#app{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitResult sets --k / --dy), keeping its pop-in */\n#resultScreen .card{transform:translateY(calc(var(--dy,0px) + 30px)) scale(calc(var(--k,1) * .8))}\n#resultScreen.show .card{transform:translateY(var(--dy,0px)) scale(var(--k,1))}\n/* owner: no knight in the game scene (the result card keeps its knight) */\n#knight{display:none!important}', [
   # owner: 20% harder — green zone 20% narrower, gem 20% faster (shrink/speed-up per pull unchanged)
   ('ZONE_WIDTH_START: 0.44,', 'ZONE_WIDTH_START: 0.352,'),
   ('ZONE_WIDTH_MIN: 0.09,', 'ZONE_WIDTH_MIN: 0.072,'),
