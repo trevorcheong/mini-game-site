@@ -315,7 +315,7 @@ window.GAMES = [
     id: "rock-n-run",
     title: "Rock N Run",
     file: "games/rock-n-run.html",
-    thumb: "thumbs/rock-n-run.jpg?v=62",
+    thumb: "thumbs/rock-n-run.jpg?v=63",
     cost: 1,
     tag: "NEW",
     color: "#e39a14",
