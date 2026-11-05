@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=64"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=65"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -322,7 +322,20 @@ patch('rock-n-run.html', '/* owner: no white focus frame on buttons */\n.btn3d:f
   ("    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1);",
    "    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1) * (o.fadeT != null ? clamp(1 - (time - o.fadeT) / 0.35, 0, 1) : 1);"),
   # (4) softer thud when the boulder jams in the gate, and a slower fade into the treasure room
-  ("stuckDone = true; shake = 24; SFX.thud();", "stuckDone = true; shake = 11; SFX.thud();"),
+  # owner: the boulder jammed in the gate sat frozen at the bottom of the treasure room and felt stuck —
+  # once the hero is through the gate it rolls back out of sight and fades (no jam, thud or debris)
+  ("      bc += (0.72 - bc) * Math.min(1, dt * 4);\n      if (!stuckDone && roomT > 0.75) { stuckDone = true; shake = 24; SFX.thud(); debris(W / 2 - GW * 0.4, H - H * 0.28, 10); debris(W / 2 + GW * 0.4, H - H * 0.28, 10); }",
+   "      bc += (-1.2 - bc) * Math.min(1, dt * 3);\n      stuckDone = true;"),
+  ("    drawDoor(door.wz - dist);\n    drawBoulder();\n  } else {",
+   "    drawDoor(door.wz - dist);\n    ctx.save(); ctx.globalAlpha = 1 - smooth(roomT / 0.45); if (ctx.globalAlpha > 0.01) drawBoulder(); ctx.restore();\n  } else {"),
+  # owner: harder, and the run keeps speeding up for longer (was 12 -> 26 m/s, top speed after 33 s)
+  ("  SPEED_START: 12, ", "  SPEED_START: 13, "),
+  ("  SPEED_ACCEL: 0.42, ", "  SPEED_ACCEL: 0.5,  "),
+  ("  SPEED_MAX: 26, ", "  SPEED_MAX: 31, "),
+  ("  DIFFICULTY_RAMP_SECONDS: 40,", "  DIFFICULTY_RAMP_SECONDS: 34,"),
+  ("  OBSTACLE_GAP_START: 24, ", "  OBSTACLE_GAP_START: 21, "),
+  ("  OBSTACLE_GAP_MIN: 12, ", "  OBSTACLE_GAP_MIN: 10, "),
+  ("  COMBO_CHANCE_MAX: 0.45,", "  COMBO_CHANCE_MAX: 0.55,"),
   ("drawTreasureRoom(clamp(roomT / 0.45, 0, 1));", "drawTreasureRoom(smooth(roomT / 0.7));"),
   # owner: jumping so high made it look like rocks and the beam could be jumped. Lower jump (a pit still needs one),
   # and slightly bigger rocks

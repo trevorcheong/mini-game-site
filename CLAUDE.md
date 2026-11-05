@@ -199,7 +199,9 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     Result card scales to fit (`fitEnd`, `--k`).
     Owner asked: lower jump (0.4 × hero height, rocks drawn 15% bigger) so rocks/beams don't look jumpable — a pit still
     needs a jump and its gems sit lower to match; the treasure-room ending brakes smoothly to a stop inside the gate
-    (no camera freeze, legs keep moving, objects ahead fade out, softer gate thud).
+    (no camera freeze, legs keep moving, objects ahead fade out); the boulder rolls back and fades out once the hero is
+    through the gate (it used to jam there). Harder (owner): speed 13 → 31 m/s at +0.5/s, obstacle gaps 21 → 10 m,
+    combo chance up to 0.55, full difficulty after 34 s.
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

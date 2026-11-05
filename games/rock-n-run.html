@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=64"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=65"></script>
 <style>/* MGS: mini game site */
 /* owner: no white focus frame on buttons */
 .btn3d:focus,.btn3d:focus-visible,button:focus,button:focus-visible{outline:none!important}
@@ -289,10 +289,10 @@ const VOUCHER_PREFIX = 'ROCKNRUN-';               // voucher codes look like ROC
 
 const CONFIG = {
   // speed (metres per second)
-  SPEED_START: 12,            // starting run speed
-  SPEED_ACCEL: 0.42,          // speed added every second
-  SPEED_MAX: 26,              // top speed
-  DIFFICULTY_RAMP_SECONDS: 40,// seconds until obstacle spacing / combos reach their hardest
+  SPEED_START: 13,            // starting run speed
+  SPEED_ACCEL: 0.5,           // speed added every second
+  SPEED_MAX: 31,              // top speed
+  DIFFICULTY_RAMP_SECONDS: 34,// seconds until obstacle spacing / combos reach their hardest
 
   // rewards
   REWARD_DISTANCE_M: 40,      // every N metres = +REWARD_STEP
@@ -303,11 +303,11 @@ const CONFIG = {
 
   // obstacles
   FIRST_OBSTACLE_M: 30,       // distance of the first obstacle
-  OBSTACLE_GAP_START: 24,     // metres between obstacle groups at the start
-  OBSTACLE_GAP_MIN: 12,       // metres between obstacle groups at max difficulty
+  OBSTACLE_GAP_START: 21,     // metres between obstacle groups at the start
+  OBSTACLE_GAP_MIN: 10,       // metres between obstacle groups at max difficulty
   MIN_REACTION_SECONDS: 0.55, // gaps never shorter than speed * this (keeps it fair)
   COMBO_CHANCE_START: 0.05,   // chance an obstacle is followed by a second one (needs a combo move)
-  COMBO_CHANCE_MAX: 0.45,
+  COMBO_CHANCE_MAX: 0.55,
   DOUBLE_ROCK_CHANCE: 0.22,   // chance of two lanes blocked by rocks (after the first ~10 s)
 
   // boulder
@@ -867,8 +867,8 @@ function update(dt) {
     else {
       roomT += dt;
       heroZ = ease(roomT / 1.3) * 7;
-      bc += (0.72 - bc) * Math.min(1, dt * 4);
-      if (!stuckDone && roomT > 0.75) { stuckDone = true; shake = 11; SFX.thud(); debris(W / 2 - GW * 0.4, H - H * 0.28, 10); debris(W / 2 + GW * 0.4, H - H * 0.28, 10); }
+      bc += (-1.2 - bc) * Math.min(1, dt * 3);
+      stuckDone = true;
       if (roomT > 0.3 && roomT < 2.8) {
         const n = Math.random() < dt * 34 ? 1 : 0;
         for (let i = 0; i < n; i++) addPart({ t: 'coin', x: rand(0, W), y: -30, vx: rand(-30, 30), vy: rand(120, 260), g: 520, life: 0, max: 3, s: rand(18, 30), r: rand(0, 6), vr: rand(-6, 6) });
@@ -1356,7 +1356,7 @@ function render() {
     const z = heroZ, k = kz(z), x = lerp(heroX, vpX, ease(roomT / 1.3));
     drawHero(x, gy(z), k, jumpT >= 0 ? 'hero_jump' : 'hero_run', 1);
     drawDoor(door.wz - dist);
-    drawBoulder();
+    ctx.save(); ctx.globalAlpha = 1 - smooth(roomT / 0.45); if (ctx.globalAlpha > 0.01) drawBoulder(); ctx.restore();
   } else {
     let pose = 'hero_run';
     if (state === 'caught' || (state === 'end' && roomT < 0 && bc > 0.8)) pose = 'hero_caught';
