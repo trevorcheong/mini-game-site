@@ -197,6 +197,9 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     (card after ~1.8 s), `money=0; caught()` = loss, `MGS_TEST.money=200; MGS_TEST.startWin()` = treasure-room escape, RM2.00
     (card after ~4 s). Its images were separate files in the artifact and are embedded (`ASSETS`). Its own claim URL is blanked.
     Result card scales to fit (`fitEnd`, `--k`).
+    Owner asked: lower jump (0.4 × hero height, rocks drawn 15% bigger) so rocks/beams don't look jumpable — a pit still
+    needs a jump and its gems sit lower to match; the treasure-room ending brakes smoothly to a stop inside the gate
+    (no camera freeze, legs keep moving, objects ahead fade out, softer gate thud).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

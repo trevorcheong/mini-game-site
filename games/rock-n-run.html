@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=63"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="mgs-bridge.js?v=64"></script>
 <style>/* MGS: mini game site */
 /* owner: no white focus frame on buttons */
 .btn3d:focus,.btn3d:focus-visible,button:focus,button:focus-visible{outline:none!important}
@@ -394,7 +394,7 @@ let nextSpawnAt = 0, gems = 0, idols = 0, idolsSpawned = 0, moneyCents = 0;
 let shake = 0, door = null, roomT = -1, heroZ = 0, stuckDone = false, coinPiles = [];
 let voucher = '';
 const JUMP_DUR = 0.62, SLIDE_DUR = 0.72;
-const jumpH = () => heroH * 0.78;
+const jumpH = () => heroH * 0.4;
 function jumpY() { return jumpT < 0 ? 0 : Math.sin(Math.PI * clamp(jumpT / JUMP_DUR, 0, 1)) * jumpH(); }
 function diff() { return clamp(runTime / CONFIG.DIFFICULTY_RAMP_SECONDS, 0, 1); }
 for (let i = 0; i < 26; i++) motes.push({ x: rand(-2.2, 2.2), y: rand(0.1, 1.6), z: rand(0, ZF), s: rand(.6, 1.4) });
@@ -548,7 +548,7 @@ function placeObstacle(kind, wz) {
   else if (kind === 'beam') addObs('beam', 0, wz);
   else if (kind === 'pit') {
     addObs('pit', 0, wz);
-    if (Math.random() < CONFIG.GEM_ARC_OVER_PIT_CHANCE) { const l = randi(-1, 1); [-1.6, 0, 1.6].forEach((dz, i) => addObs('gem', l, wz + dz, { h: i === 1 ? 0.55 : 0.32 })); }
+    if (Math.random() < CONFIG.GEM_ARC_OVER_PIT_CHANCE) { const l = randi(-1, 1); [-1.6, 0, 1.6].forEach((dz, i) => addObs('gem', l, wz + dz, { h: i === 1 ? 0.42 : 0.26 })); }
   }
 }
 function pickKind() {
@@ -625,7 +625,7 @@ function caught() {
 }
 function startWin() {
   state = 'win'; stateT = 0; roomT = -1; musicStop();
-  objs = objs.filter(o => o.wz - dist < 1.5 && (o.kind === 'gem' || o.kind === 'idol') === false);
+  objs.forEach(o => { if (o.wz - dist >= 1.5 || o.kind === 'gem' || o.kind === 'idol') o.fadeT = time; });
   door = { wz: dist + Math.max(16, speed * 1.05) };
   jumpT = -1; slideT = 0; targetLane = 0;
   $('vignette').classList.remove('danger');
@@ -774,8 +774,9 @@ function update(dt) {
   if (invulnT > 0) invulnT -= dt;
   if (stumbleT > 0) stumbleT -= dt;
   // run cycle timing: steps per second grows with speed
-  if (speed > 0.5 && jumpT < 0 && slideT <= 0 && state !== 'caught' && state !== 'end') {
-    runPhase += dt * (2.6 + speed * 0.11);
+  const walkIn = state === 'win' && roomT >= 0 && roomT < 1.35;
+  if ((speed > 0.5 || walkIn) && jumpT < 0 && slideT <= 0 && state !== 'caught' && state !== 'end') {
+    runPhase += dt * (2.6 + Math.max(speed, walkIn ? 9 * (1 - roomT / 1.35) + 3 : 0) * 0.11);
     const st = Math.floor(runPhase);
     if (st !== lastStep) {          // footfall: little dust puff at the planted foot
       lastStep = st;
@@ -791,7 +792,7 @@ function update(dt) {
   else if (state === 'countdown') speed = 5;
   else if (state === 'run') { runTime += dt; speed = Math.min(CONFIG.SPEED_MAX, CONFIG.SPEED_START + CONFIG.SPEED_ACCEL * runTime); }
   else if (state === 'caught') speed = Math.max(0, speed - speed * 4 * dt - 6 * dt);
-  else if (state === 'win') { if (roomT >= 0) speed = Math.max(0, speed - 30 * dt); }
+  else if (state === 'win') { const rem = door.wz + 0.6 - dist; speed = rem <= 0 ? 0 : Math.min(speed, Math.max(0.5, Math.sqrt(2 * 14 * rem)), rem / dt); }
   else if (state === 'end') speed = Math.max(0, speed - 20 * dt);
 
   scroll += speed * dt;
@@ -850,7 +851,7 @@ function update(dt) {
     updateMoney();
     if (state === 'run') hud();
   }
-  objs = objs.filter(o => o.wz - dist > -3 && !(o.got && o.kind !== 'gem' && o.kind !== 'idol'));
+  objs = objs.filter(o => o.wz - dist > -3 && !(o.got && o.kind !== 'gem' && o.kind !== 'idol') && !(o.fadeT != null && time - o.fadeT > 0.4));
   for (const o of objs) if (o.hit) o.ht += dt;
 
   if (state === 'caught') {
@@ -865,10 +866,9 @@ function update(dt) {
     if (roomT < 0) { bc += (0.15 - bc) * Math.min(1, dt * 2); if (dz <= 0.3) { roomT = 0; SFX.win(); } }
     else {
       roomT += dt;
-      if (dz < -0.6) dist = door.wz + 0.6;
       heroZ = ease(roomT / 1.3) * 7;
       bc += (0.72 - bc) * Math.min(1, dt * 4);
-      if (!stuckDone && roomT > 0.75) { stuckDone = true; shake = 24; SFX.thud(); debris(W / 2 - GW * 0.4, H - H * 0.28, 10); debris(W / 2 + GW * 0.4, H - H * 0.28, 10); }
+      if (!stuckDone && roomT > 0.75) { stuckDone = true; shake = 11; SFX.thud(); debris(W / 2 - GW * 0.4, H - H * 0.28, 10); debris(W / 2 + GW * 0.4, H - H * 0.28, 10); }
       if (roomT > 0.3 && roomT < 2.8) {
         const n = Math.random() < dt * 34 ? 1 : 0;
         for (let i = 0; i < n; i++) addPart({ t: 'coin', x: rand(0, W), y: -30, vx: rand(-30, 30), vy: rand(120, 260), g: 520, life: 0, max: 3, s: rand(18, 30), r: rand(0, 6), vr: rand(-6, 6) });
@@ -1092,7 +1092,7 @@ function drawWallsTex(zN) {
 
 /* ---------------- sprites (image or fallback shape) ---------------- */
 function drawRock(x, by, w, a) {
-  const h = w / aspect('obstacle_rock', 1.19);
+  w *= 1.15; const h = w / aspect('obstacle_rock', 1.19);
   ctx.globalAlpha = a;
   if (ok('obstacle_rock')) ctx.drawImage(IMG.obstacle_rock, x - w / 2, by - h * 0.94, w, h);
   else {
@@ -1223,7 +1223,7 @@ function drawObjects(near) {
   const zN = nearZ();
   for (const o of list) {
     const z = o.wz - dist; if (z > ZF || z < zN) continue;
-    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1);
+    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1) * (o.fadeT != null ? clamp(1 - (time - o.fadeT) / 0.35, 0, 1) : 1);
     if (a <= 0) continue;
     const by = gy(z);
     if (o.kind === 'rock') { const x = lx(o.lane, z), w = LW * 0.98 * k; shadow(x, by, w * 0.55, 0.5 * a); drawRock(x, by, w, a); }
@@ -1352,7 +1352,7 @@ function render() {
 
   const heroX = lx(playerX, 0);
   if (inRoom && roomT >= 0) {
-    ctx.save(); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); drawTreasureRoom(clamp(roomT / 0.45, 0, 1)); ctx.restore();
+    ctx.save(); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); drawTreasureRoom(smooth(roomT / 0.7)); ctx.restore();
     const z = heroZ, k = kz(z), x = lerp(heroX, vpX, ease(roomT / 1.3));
     drawHero(x, gy(z), k, jumpT >= 0 ? 'hero_jump' : 'hero_run', 1);
     drawDoor(door.wz - dist);

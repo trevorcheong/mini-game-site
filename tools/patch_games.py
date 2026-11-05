@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=63"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=64"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -306,6 +306,30 @@ patch('rock-n-run.html', '/* owner: no white focus frame on buttons */\n.btn3d:f
   # play again after a win or a loss costs TOKEN (every run ends the paid game)
   ("$('againBtn').addEventListener('click', () => {\n  audioInit(); SFX.button();\n  const es = $('endScreen'); es.classList.remove('show');\n  setTimeout(() => { es.classList.add('hidden'); startCountdown(); }, 200);\n});",
    "$('againBtn').addEventListener('click', MGS.paid(() => {\n  audioInit(); SFX.button();\n  const es = $('endScreen'); es.classList.remove('show');\n  setTimeout(() => { es.classList.add('hidden'); startCountdown(); }, 200);\n}));"),
+  # owner: the ending at the temple door felt choppy. (1) slow down smoothly and stop just inside the door,
+  # instead of braking hard and freezing the camera while the floor kept sliding
+  ("  else if (state === 'win') { if (roomT >= 0) speed = Math.max(0, speed - 30 * dt); }",
+   "  else if (state === 'win') { const rem = door.wz + 0.6 - dist; speed = rem <= 0 ? 0 : Math.min(speed, Math.max(0.5, Math.sqrt(2 * 14 * rem)), rem / dt); }"),
+  ("      if (dz < -0.6) dist = door.wz + 0.6;\n", ''),
+  # (2) the hero keeps his running stride while he walks into the treasure room (legs froze when the camera stopped)
+  ("  if (speed > 0.5 && jumpT < 0 && slideT <= 0 && state !== 'caught' && state !== 'end') {\n    runPhase += dt * (2.6 + speed * 0.11);",
+   "  const walkIn = state === 'win' && roomT >= 0 && roomT < 1.35;\n  if ((speed > 0.5 || walkIn) && jumpT < 0 && slideT <= 0 && state !== 'caught' && state !== 'end') {\n    runPhase += dt * (2.6 + Math.max(speed, walkIn ? 9 * (1 - roomT / 1.35) + 3 : 0) * 0.11);"),
+  # (3) obstacles and gems ahead fade out instead of vanishing in one frame
+  ("  objs = objs.filter(o => o.wz - dist < 1.5 && (o.kind === 'gem' || o.kind === 'idol') === false);",
+   "  objs.forEach(o => { if (o.wz - dist >= 1.5 || o.kind === 'gem' || o.kind === 'idol') o.fadeT = time; });"),
+  ("  objs = objs.filter(o => o.wz - dist > -3 && !(o.got && o.kind !== 'gem' && o.kind !== 'idol'));",
+   "  objs = objs.filter(o => o.wz - dist > -3 && !(o.got && o.kind !== 'gem' && o.kind !== 'idol') && !(o.fadeT != null && time - o.fadeT > 0.4));"),
+  ("    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1);",
+   "    const k = kz(z), a = clamp((ZF - z) / 8, 0, 1) * (o.hit ? clamp(1 - o.ht * 2.5, 0, 1) : 1) * (o.fadeT != null ? clamp(1 - (time - o.fadeT) / 0.35, 0, 1) : 1);"),
+  # (4) softer thud when the boulder jams in the gate, and a slower fade into the treasure room
+  ("stuckDone = true; shake = 24; SFX.thud();", "stuckDone = true; shake = 11; SFX.thud();"),
+  ("drawTreasureRoom(clamp(roomT / 0.45, 0, 1));", "drawTreasureRoom(smooth(roomT / 0.7));"),
+  # owner: jumping so high made it look like rocks and the beam could be jumped. Lower jump (a pit still needs one),
+  # and slightly bigger rocks
+  ("const jumpH = () => heroH * 0.78;", "const jumpH = () => heroH * 0.4;"),
+  # gems floating over a pit sit lower to match the lower jump (still collected near the top of the jump)
+  ("addObs('gem', l, wz + dz, { h: i === 1 ? 0.55 : 0.32 })", "addObs('gem', l, wz + dz, { h: i === 1 ? 0.42 : 0.26 })"),
+  ("  const h = w / aspect('obstacle_rock', 1.19);", "  w *= 1.15; const h = w / aspect('obstacle_rock', 1.19);"),
   # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
   ("requestAnimationFrame(loop);\n</script>",
    "requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audioInit);\n"
