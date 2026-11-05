@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=61"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=62"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -280,6 +280,38 @@ patch('punch-rush.html', '/* fill the whole frame (the game was capped at 520px 
   ('window.PunchRush={CFG,start:startCountdown};',
    "window.PunchRush={CFG,start:startCountdown};\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audioInit);\nMGS.boot(startCountdown);\n"
    "window.MGS_TEST={CFG,punch,endGame,hurt,get state(){return state},get reward(){return reward},set reward(v){reward=v;setMoney(false)},get lives(){return lives},get enemies(){return enemies}};"),
+])
+
+# Rock N Run: temple runner, a boulder chases you. Every 40 m, every 10 gems and each golden idol = +RM0.10;
+# RM2.00 = escape into the treasure room. Two hits within 5 s = caught (you keep what you won).
+# The artifact loaded assets/*.webp; the original in games_original_backup/ has them embedded (ASSETS).
+patch('rock-n-run.html', '/* owner: no white focus frame on buttons */\n.btn3d:focus,.btn3d:focus-visible,button:focus,button:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitEnd sets --k), keeping its pop-in */\n#endScreen.show .modal{transform:scale(var(--k,1))!important}', [
+  # never open the game's own claim page; the site takes over CLAIM (mgs-bridge)
+  ("const CLAIM_URL = 'https://example.com/claim';", "const CLAIM_URL = '';"),
+  ("  if (CLAIM_OPEN_IN_NEW_TAB) window.open(url.toString(), '_blank'); else window.location.href = url.toString();\n", ''),
+  # no free start with Enter / Space
+  ("  if ((k === 'Enter' || k === ' ') && state === 'menu') { e.preventDefault(); $('startBtn').click(); }\n", ''),
+  # owner-facing wording: a run with no prize says "So close!" instead of "You won RM0.00!"
+  ("  $('endAmt').textContent = fmtRM(moneyCents);\n",
+   "  $('endHead').innerHTML = moneyCents > 0 ? 'You won <span class=\"amt\" id=\"endAmt\">' + fmtRM(moneyCents) + '</span>!' : 'So close!';\n"),
+  # report the result to the site; fit the card
+  ("  const es = $('endScreen'); es.classList.remove('hidden'); void es.offsetWidth; es.classList.add('show');\n}",
+   "  const es = $('endScreen'); es.classList.remove('hidden'); fitEnd(); void es.offsetWidth; es.classList.add('show');\n"
+   "  if (has) MGS.win({ amount: moneyCents / 100, code: voucher, label: fmtRM(moneyCents) }); else MGS.gameOver();\n}\n"
+   "function fitEnd() {\n  const m = document.querySelector('#endScreen .modal'); m.style.setProperty('--k', 1);\n"
+   "  const H = stageEl.clientHeight, h = m.offsetHeight;  // card is centred in the screen below its 110px top padding; the badge sticks out 118px above it\n"
+   "  const k = Math.min(1, (H - 110) / h, (H + 70) / (h + 236), (stageEl.clientWidth - 20) / m.offsetWidth);\n"
+   "  m.style.setProperty('--k', k.toFixed(3));\n}\n"
+   "window.addEventListener('resize', () => { if (state === 'end') fitEnd(); });"),
+  # play again after a win or a loss costs TOKEN (every run ends the paid game)
+  ("$('againBtn').addEventListener('click', () => {\n  audioInit(); SFX.button();\n  const es = $('endScreen'); es.classList.remove('show');\n  setTimeout(() => { es.classList.add('hidden'); startCountdown(); }, 200);\n});",
+   "$('againBtn').addEventListener('click', MGS.paid(() => {\n  audioInit(); SFX.button();\n  const es = $('endScreen'); es.classList.remove('show');\n  setTimeout(() => { es.classList.add('hidden'); startCountdown(); }, 200);\n}));"),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ("requestAnimationFrame(loop);\n</script>",
+   "requestAnimationFrame(loop);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(audioInit);\n"
+   "MGS.boot(function () { $('startScreen').classList.add('hidden'); startCountdown(); });\n"
+   "window.MGS_TEST = { CONFIG, act, caught, startWin, showEnd, get state() { return state; }, get money() { return moneyCents; }, set money(v) { moneyCents = v; hud(); },\n"
+   "  get dist() { return dist; }, get gems() { return gems; }, get objs() { return objs; }, get playerX() { return playerX; } };\n</script>"),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

@@ -68,8 +68,8 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 14 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush.
+- 15 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush, Rock N Run.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -108,7 +108,7 @@ Do not treat the site as production-safe until these exist.
 1. Put the original HTML in `games_original_backup/` and a 1:1 thumbnail in `thumbs/`.
    Games often come from the owner's claude.ai artifacts (Artifact tool, `read`).
    If an artifact loads separate files (e.g. `assets/*.png`), embed them as data URIs into one
-   self-contained HTML before saving it as the original (done for Pocket Pilot).
+   self-contained HTML before saving it as the original (done for Pocket Pilot and Rock N Run).
 2. In `tools/patch_games.py`, add a `patch(...)` entry. It must:
    - call `MGS.win` on win and `MGS.gameOver` on final loss
    - wrap replay buttons with `MGS.paid`
@@ -192,6 +192,11 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     Waits for `MGS_TEST.state==='play'` after its own 3-2-1-FIGHT! countdown. Its Space/Enter restart and `?return=` claim
     link are removed; CLAIM is always shown when a voucher is won. Again button uses mousedown/mouseup (bindBtn), not click.
     Result card scales to fit (`fitCard`, `--k` in the `cin` keyframe).
+  - Rock N Run: top-level script (not an IIFE), exposes `window.MGS_TEST`. Swipe with the mouse (drag ≥30 px) or arrow keys
+    once `MGS_TEST.state==='run'` (after its own 3-2-1-RUN! countdown). `MGS_TEST.money=70; MGS_TEST.caught()` = RM0.70 voucher
+    (card after ~1.8 s), `money=0; caught()` = loss, `MGS_TEST.money=200; MGS_TEST.startWin()` = treasure-room escape, RM2.00
+    (card after ~4 s). Its images were separate files in the artifact and are embedded (`ASSETS`). Its own claim URL is blanked.
+    Result card scales to fit (`fitEnd`, `--k`).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

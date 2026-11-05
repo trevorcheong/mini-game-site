@@ -310,5 +310,26 @@ window.GAMES = [
       "别打炸弹，让它滚过去。",
       "太早出拳会打空。有 3 条命。已赢的归你，最多 RM2.00。"
     ]
+  },
+  {
+    id: "rock-n-run",
+    title: "Rock N Run",
+    file: "games/rock-n-run.html",
+    thumb: "thumbs/rock-n-run.jpg?v=62",
+    cost: 1,
+    tag: "NEW",
+    color: "#e39a14",
+    howTo: [
+      "Swipe left or right to switch lanes, up to jump, down to slide.",
+      "Every 40 m adds RM0.10. So do every 10 gems and each golden idol.",
+      "Hit something and the boulder rolls closer. A second hit within 5 seconds and it catches you.",
+      "Reach RM2.00 to escape into the treasure room. You keep what you won."
+    ],
+    howTo_zh: [
+      "左右滑动换跑道，往上滑跳起，往下滑滑铲。",
+      "每跑 40 米加 RM0.10，每收集 10 颗宝石、每拿到一个金像也各加 RM0.10。",
+      "撞到障碍物，巨石就会追近。5 秒内再撞一次就会被巨石追上。",
+      "赢到 RM2.00 就能逃进宝藏室。已赢的归你。"
+    ]
   }
 ];
