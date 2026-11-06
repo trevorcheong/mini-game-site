@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=65"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=66"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -349,6 +349,61 @@ patch('rock-n-run.html', '/* owner: no white focus frame on buttons */\n.btn3d:f
    "MGS.boot(function () { $('startScreen').classList.add('hidden'); startCountdown(); });\n"
    "window.MGS_TEST = { CONFIG, act, caught, startWin, showEnd, get state() { return state; }, get money() { return moneyCents; }, set money(v) { moneyCents = v; hud(); },\n"
    "  get dist() { return dist; }, get gems() { return gems; }, get objs() { return objs; }, get playerX() { return playerX; } };\n</script>"),
+])
+
+# Walk the Plank: pirate balance game. STEP when the needle is in the green; each step +RM0.10 (20 steps = RM2.00 and the
+# treasure chest); the plank may snap. 3 lives per paid game (a fall restarts at the ship at RM0.00 — free, same game);
+# CASH OUT keeps the prize. Already one self-contained file (EMBED data URIs).
+patch('walk-the-plank.html', '/* fill the whole frame (the game showed itself as a 430px phone on screens 600px+ wide) */\n#app{inset:0!important;left:0!important;top:0!important;width:auto!important;height:auto!important;transform:none!important;border-radius:0!important;box-shadow:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitEnd sets --k) */\n#end:not(.hidden) .modal{transform:scale(var(--k,1))!important}', [
+  # never open the game's own claim page; the site takes over CLAIM (mgs-bridge)
+  ('var CLAIM_URL = "https://example.com/claim";', 'var CLAIM_URL = "";'),
+  ('  if (CLAIM_IN_NEW_TAB) window.open(url, "_blank"); else location.href = url;\n', ''),
+  # report the result to the site (cash out / treasure = voucher, out of lives = loss); fit the card
+  ('  G.endReady = now() + 650;\n  $("end").classList.remove("hidden");\n}',
+   '  G.endReady = now() + 650;\n  $("end").classList.remove("hidden"); fitEnd();\n'
+   '  if (cents > 0) MGS.win({ amount: cents / 100, code: lastCode, label: rm(cents) }); else MGS.gameOver();\n}\n'
+   'function fitEnd() {\n  var m = $("modal"), H = $("app").clientHeight, W = $("app").clientWidth; m.style.setProperty("--k", 1);\n'
+   '  m.style.setProperty("--k", Math.min(1, (H - 24) / m.offsetHeight, (W - 16) / m.offsetWidth).toFixed(3));\n}\n'
+   'window.addEventListener("resize", function(){ if (!$("end").classList.contains("hidden")) fitEnd(); });'),
+  # play again after cash out / treasure / out of lives costs TOKEN (falls with lives left stay free)
+  ('press($("againBtn"), playAgain);', 'press($("againBtn"), function(){ if (now() < G.endReady) return; MGS.paid(startGame)(); });'),
+  # no free start / replay from the keyboard
+  ('    if (G.phase === "start") startGame(); else if (G.phase === "play") doStep(); else if (!$("end").classList.contains("hidden")) playAgain(); }',
+   '    if (G.phase === "play") doStep(); }'),
+  ('    if (G.phase === "start") startGame(); else if (G.phase === "play") cashOut(); }',
+   '    if (G.phase === "play") cashOut(); }'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('window.__wtp = G;\n})();',
+   'window.__wtp = G;\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(Sound.unlock);\nMGS.boot(startGame);\n'
+   'window.MGS_TEST = { G: G, doStep: doStep, cashOut: cashOut, showEnd: showEnd, winGame: winGame, startFall: startFall, zoneAt: zoneAt };\n})();'),
+])
+
+# Planet Hop: tap to launch the astronaut from a spinning planet to the next one. Each planet +RM0.10, stars +RM0.10,
+# gold planet +RM0.20, up to RM2.00; 30 s clock (time up keeps the prize); drifting into space or a meteor ends the game.
+# The artifact loaded assets/*.webp|png; the original in games_original_backup/ has the webp versions embedded (ASSETS).
+patch('planet-hop.html', '/* fill the whole frame (the game showed itself as a phone in a frame on wider screens) */\n#app{inset:0!important;left:0!important;top:0!important;bottom:0!important;width:auto!important;transform:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}\n#backdrop{display:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,.iconBtn:focus,.iconBtn:focus-visible,button:focus,button:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitEnd sets --k) */\n#over.on .panel{transform:scale(var(--k,1))!important}', [
+  # never open the game's own claim page; the site takes over CLAIM (mgs-bridge)
+  ('const CLAIM_URL = "https://example.com/claim";', 'const CLAIM_URL = "";'),
+  ('  if (CLAIM_NEW_TAB) window.open(url.toString(), "_blank", "noopener"); else location.href = url.toString();\n', ''),
+  # report the result to the site; fit the card
+  ('  const o = $("over"); o.classList.remove("hidden"); requestAnimationFrame(() => o.classList.add("on"));',
+   '  const o = $("over"); o.classList.remove("hidden"); fitEnd(); requestAnimationFrame(() => o.classList.add("on"));\n'
+   '  if (has) MGS.win({ amount: cents / 100, code: lastCode, label: fmt(cents) }); else MGS.gameOver();'),
+  ('function copyCode(){',
+   'function fitEnd(){\n  const m = $("over").querySelector(".panel"); m.style.setProperty("--k", 1);\n'
+   '  m.style.setProperty("--k", Math.min(1, (H - 30) / m.offsetHeight, (W - 16) / m.offsetWidth).toFixed(3));\n}\n'
+   'window.addEventListener("resize", () => { if (state === "over") fitEnd(); });\nfunction copyCode(){'),
+  # play again after any result costs TOKEN (one life per game)
+  ('bindPress($("againBtn"), startGame);', 'bindPress($("againBtn"), MGS.paid(startGame));'),
+  # no free start from the keyboard
+  ('    if (state === "menu") startGame(); else if (state === "ready") { Audio.init(); launch(); }',
+   '    if (state === "ready") { Audio.init(); launch(); }'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('reset();\nrequestAnimationFrame(frame);\n',
+   'reset();\nrequestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(Audio.init);\nMGS.boot(startGame);\n'
+   'window.MGS_TEST = { CONFIG, launch, win, lose, timeUp, showOver, get state(){ return state; }, get cents(){ return cents; }, set cents(v){ cents = v; updateHud(); },\n'
+   '  get landed(){ return landed; }, get cur(){ return cur; }, get next(){ return next; }, get hero(){ return hero; }, heroFeet,\n'
+   '  get timeLeft(){ return timeLeft; }, set timeLeft(v){ timeLeft = v; } };\n'),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

@@ -68,11 +68,14 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 15 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
-  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush, Rock N Run.
+- 17 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+  Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush, Rock N Run,
+  Walk the Plank, Planet Hop.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
+- Walk the Plank: 3 lives per paid game; a fall restarts at the ship at RM0.00 for free. CASH OUT, the chest
+  (RM2.00) or running out of lives ends the paid game.
 - Leaving play.html mid-game shows a warning that TOKEN is not refunded.
   iOS Safari ignores `beforeunload`, so play.html also pushes a history entry when the game starts and
   catches `popstate` (phone back button / swipe back) to show the same warning. Closing an in-app browser
@@ -108,7 +111,7 @@ Do not treat the site as production-safe until these exist.
 1. Put the original HTML in `games_original_backup/` and a 1:1 thumbnail in `thumbs/`.
    Games often come from the owner's claude.ai artifacts (Artifact tool, `read`).
    If an artifact loads separate files (e.g. `assets/*.png`), embed them as data URIs into one
-   self-contained HTML before saving it as the original (done for Pocket Pilot and Rock N Run).
+   self-contained HTML before saving it as the original (done for Pocket Pilot, Rock N Run and Planet Hop).
 2. In `tools/patch_games.py`, add a `patch(...)` entry. It must:
    - call `MGS.win` on win and `MGS.gameOver` on final loss
    - wrap replay buttons with `MGS.paid`
@@ -202,6 +205,15 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     (no camera freeze, legs keep moving, objects ahead fade out); the boulder rolls back and fades out once the hero is
     through the gate (it used to jam there). Harder (owner): speed 13 → 31 m/s at +0.5/s, obstacle gaps 21 → 10 m,
     combo chance up to 0.55, full difficulty after 34 s.
+  - Walk the Plank: IIFE, exposes `window.MGS_TEST` (`G` is the game state). Tap STEP when `|G.needle| < MGS_TEST.zoneAt(G.step)`;
+    set `MGS_TEST.G.preBreak=false` first to stop the plank snapping in a test. CASH OUT after a step = voucher;
+    `G.busy=true; MGS_TEST.startFall('slip')` costs a life (3 falls = loss card); `G.step=20; G.cents=200; MGS_TEST.winGame()`
+    = chest, RM2.00. Already self-contained (EMBED data URIs). Its claim URL is blanked; its 430px "phone" frame on wide
+    screens is turned off. Result card scales to fit (`fitEnd`, `--k`).
+  - Planet Hop: IIFE, exposes `window.MGS_TEST`. Tap when the aim (`MGS_TEST.heroFeet().th`) points at `MGS_TEST.next`, in
+    state `ready` (after its own 3-2-1-GO countdown). `MGS_TEST.cents=70; MGS_TEST.timeUp()` = RM0.70 voucher (card after
+    ~1.3 s), `cents=0; timeUp()` = loss, `cents=200; MGS_TEST.win()` = RM2.00. Images embedded (`ASSETS`, webp). Its claim
+    URL is blanked; its phone-in-a-frame layout on wider screens is turned off. Result card scales to fit (`fitEnd`, `--k`).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

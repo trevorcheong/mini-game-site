@@ -331,5 +331,47 @@ window.GAMES = [
       "撞到障碍物，巨石就会追近。5 秒内再撞一次就会被巨石追上。",
       "赢到 RM2.00 就能逃进宝藏室。已赢的归你。"
     ]
+  },
+  {
+    id: "walk-the-plank",
+    title: "Walk the Plank",
+    file: "games/walk-the-plank.html",
+    thumb: "thumbs/walk-the-plank.jpg?v=66",
+    cost: 1,
+    tag: "NEW",
+    color: "#1fb3c9",
+    howTo: [
+      "Tap STEP when the needle is in the green zone. Each step adds RM0.10.",
+      "The plank can snap without warning. The break risk for the next step is shown.",
+      "You have 3 lives. A fall sends you back to the ship at RM0.00.",
+      "Tap CASH OUT any time to keep your prize. Reach the treasure chest for RM2.00."
+    ],
+    howTo_zh: [
+      "指针在绿色区域时按 STEP，每走一步加 RM0.10。",
+      "木板可能会突然断掉，下一步断掉的风险会显示出来。",
+      "有 3 条命。掉下海就回到船上，从 RM0.00 重新开始。",
+      "随时按 CASH OUT 拿走奖金。走到宝箱就是 RM2.00。"
+    ]
+  },
+  {
+    id: "planet-hop",
+    title: "Planet Hop",
+    file: "games/planet-hop.html",
+    thumb: "thumbs/planet-hop.jpg?v=66",
+    cost: 1,
+    tag: "NEW",
+    color: "#6b3fd6",
+    howTo: [
+      "Tap to launch the astronaut from the spinning planet. Time it so he lands on the next one.",
+      "Each planet adds RM0.10, each star RM0.10, a gold planet RM0.20 — up to RM2.00.",
+      "Miss a planet or hit a meteor and the game ends. You keep what you won.",
+      "You have 30 seconds. Stars add 1 extra second."
+    ],
+    howTo_zh: [
+      "点一下屏幕，太空人就从旋转的星球弹出去，抓准时机落到下一颗星球。",
+      "每颗星球加 RM0.10，星星加 RM0.10，金色星球加 RM0.20，最多 RM2.00。",
+      "没落到星球或撞到陨石，游戏就结束。已赢的归你。",
+      "每局 30 秒，吃到星星多 1 秒。"
+    ]
   }
 ];
