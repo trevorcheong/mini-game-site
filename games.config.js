@@ -373,5 +373,26 @@ window.GAMES = [
       "没落到星球或撞到陨石，游戏就结束。已赢的归你。",
       "每局 30 秒，吃到星星多 1 秒。"
     ]
+  },
+  {
+    id: "golden-eyes",
+    title: "Golden Eyes",
+    file: "games/golden-eyes.html",
+    thumb: "thumbs/golden-eyes.jpg?v=67",
+    cost: 1,
+    tag: "NEW",
+    color: "#c8201e",
+    howTo: [
+      "A demon hides in the crowd, disguised as one of them. Watch for its clue: a tail, horns, green eyes, an odd shadow, purple smoke, or the one who doesn't nod.",
+      "Tap the demon before the timer runs out. Each demon found adds RM0.10.",
+      "A wrong tap or running out of time ends the game. You keep what you won.",
+      "Stuck? Tap GOLDEN EYES once per game and the demon glows gold. 20 rounds = RM2.00."
+    ],
+    howTo_zh: [
+      "妖怪混在人群里，伪装成其中一个人。留意它露出的破绽：尾巴、犄角、绿眼睛、奇怪的影子、紫色妖气，或是大家点头时只有它不点头。",
+      "在时间用完前点中妖怪，每抓到一只加 RM0.10。",
+      "点错人或时间用完，游戏就结束。已赢的归你。",
+      "找不到？每局可以用一次「GOLDEN EYES」火眼金睛，妖怪会发出金光。过完 20 关就是 RM2.00。"
+    ]
   }
 ];

@@ -68,9 +68,9 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 17 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+- 18 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
   Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush, Rock N Run,
-  Walk the Plank, Planet Hop.
+  Walk the Plank, Planet Hop, Golden Eyes.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -214,6 +214,12 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     state `ready` (after its own 3-2-1-GO countdown). `MGS_TEST.cents=70; MGS_TEST.timeUp()` = RM0.70 voucher (card after
     ~1.3 s), `cents=0; timeUp()` = loss, `cents=200; MGS_TEST.win()` = RM2.00. Images embedded (`ASSETS`, webp). Its claim
     URL is blanked; its phone-in-a-frame layout on wider screens is turned off. Result card scales to fit (`fitEnd`, `--k`).
+  - Golden Eyes: IIFE, exposes `window.MGS_TEST`. Already self-contained (ASSETS data URIs). Once `MGS_TEST.state==='play'`, tap
+    the demon (`MGS_TEST.fake`) to score RM0.10; tapping another person (`MGS_TEST.monks`) or time-up ends the game.
+    `MGS_TEST.amount=0.7; MGS_TEST.endGame(false)` = RM0.70 voucher, `amount=0; endGame(false)` = loss,
+    `MGS_TEST.amount=2; MGS_TEST.victory()` = RM2.00 (card after ~3 s). GOLDEN EYES (`#skillBtn`) works once per game.
+    Its claim URL and `target="_blank"` CLAIM link are removed; its 520px width cap is off. Result card scales to fit
+    (`fitEnd`, CSS `scale: var(--k)` so its pop-in animation still runs).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

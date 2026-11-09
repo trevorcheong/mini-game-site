@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=66"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=67"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -404,6 +404,31 @@ patch('planet-hop.html', '/* fill the whole frame (the game showed itself as a p
    'window.MGS_TEST = { CONFIG, launch, win, lose, timeUp, showOver, get state(){ return state; }, get cents(){ return cents; }, set cents(v){ cents = v; updateHud(); },\n'
    '  get landed(){ return landed; }, get cur(){ return cur; }, get next(){ return next; }, get hero(){ return hero; }, heroFeet,\n'
    '  get timeLeft(){ return timeLeft; }, set timeLeft(v){ timeLeft = v; } };\n'),
+])
+
+# Golden Eyes: already self-contained (ASSETS data URIs). One wrong tap or time-up ends the paid game (keeps the prize);
+# 20 rounds / RM2.00 = victory.
+patch('golden-eyes.html', '/* fill the whole frame (the game was capped at 520px wide) */\n#game{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible,a:focus,a:focus-visible{outline:none!important}\n/* the site takes over CLAIM, so it is a button-looking link without href */\n#claimBtn{cursor:pointer}\n/* result card scales to fit short phones (fitEnd sets --k); `scale` composes with its pop-in transform */\n#endCard{scale:var(--k,1)}', [
+  # never open the game's own claim page or a new tab; the site takes over CLAIM (mgs-bridge)
+  ('const CLAIM_URL = "https://example.com/claim";', 'const CLAIM_URL = "";'),
+  ('<a id="claimBtn" class="btn" target="_blank" rel="noopener" href="#">CLAIM NOW</a>', '<a id="claimBtn" class="btn" role="button">CLAIM NOW</a>'),
+  ("    $('claimBtn').href = CLAIM_URL + (CLAIM_URL.indexOf('?') >= 0 ? '&' : '?') + 'amount=' + amount.toFixed(2) + '&code=' + voucher;\n", ''),
+  ("cb.addEventListener('click', () => { cb.href = claim(); });\n", ''),
+  # report the result to the site; fit the card
+  ("  $('copyBtn').textContent = 'COPY';\n  $('end').classList.remove('hide');\n}",
+   "  $('copyBtn').textContent = 'COPY';\n  $('end').classList.remove('hide'); fitEnd();\n"
+   "  if (has) MGS.win({ amount: Math.round(amount * 100) / 100, code: voucher, label: fmt(amount) }); else MGS.gameOver();\n}\n"
+   "function fitEnd(){\n  const c = $('endCard'); c.style.setProperty('--k', 1);\n"
+   "  c.style.setProperty('--k', Math.min(1, (H - 24) / c.offsetHeight, (W - 16) / c.offsetWidth).toFixed(3));\n}"),
+  ("window.addEventListener('resize', () => { measure();", "window.addEventListener('resize', () => { measure(); if (state === 'end') fitEnd();"),
+  # play again after any result costs TOKEN
+  ("bindBtn($('againBtn'), () => { clearRound(); startGame(); });", "bindBtn($('againBtn'), MGS.paid(() => { clearRound(); startGame(); }));"),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ("measure(); updateHud();\n})();",
+   "measure(); updateHud();\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\n"
+   "window.MGS_TEST = { startGame, nextRound, endGame, victory, useSkill, onTap, params, fitEnd,\n"
+   "  get state(){ return state; }, get round(){ return round; }, set round(v){ round = v; }, get amount(){ return amount; }, set amount(v){ amount = v; updateHud(); },\n"
+   "  get fake(){ return fake; }, get monks(){ return monks; }, get skillLeft(){ return skillLeft; } };\n})();"),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a
