@@ -15,7 +15,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 D=os.path.join(ROOT,'games_original_backup')+os.sep; O=os.path.join(ROOT,'games')+os.sep
 def patch(fn, css, reps):
     s=open(D+fn,encoding='utf-8').read()
-    head='<script src="mgs-bridge.js?v=67"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
+    head='<script src="mgs-bridge.js?v=68"></script>\n<style>/* MGS: mini game site */\n'+css+'\n</style>\n</head>'
     if s.count('</head>')==1: s=s.replace('</head>',head)
     else: s=s.replace('</style>','</style>\n'+head[:-len('</head>')],1)
     for a,b in reps:
@@ -429,6 +429,27 @@ patch('golden-eyes.html', '/* fill the whole frame (the game was capped at 520px
    "window.MGS_TEST = { startGame, nextRound, endGame, victory, useSkill, onTap, params, fitEnd,\n"
    "  get state(){ return state; }, get round(){ return round; }, set round(v){ round = v; }, get amount(){ return amount; }, set amount(v){ amount = v; updateHud(); },\n"
    "  get fake(){ return fake; }, get monks(){ return monks; }, get skillLeft(){ return skillLeft; } };\n})();"),
+])
+
+# Thunder Strike: 3 hearts per paid game (a monster reaching the village costs one); losing all hearts or RM2.00 ends it,
+# keeping the prize. Its images were separate files in the artifact and are embedded (ASSETS / CSS data URIs).
+patch('thunder-strike.html', '/* fill the whole frame (the game was capped at 520px wide) */\n#app{max-width:none!important}\n/* owner: no white focus frame on buttons */\n.btn:focus,.btn:focus-visible,button:focus,button:focus-visible{outline:none!important}\n/* result card scales to fit short phones (fitEnd sets --k); `scale` composes with its pop-in transform */\n#modal{scale:var(--k,1)}', [
+  # the site takes over CLAIM (mgs-bridge listens for the click; the game's own touch handler would swallow it on phones)
+  ('  if($("claimBtn")) bindBtn($("claimBtn"),function(){ claim(amt,currentCode); });\n', ''),
+  # play again after any result costs TOKEN
+  ('  bindBtn($("againBtn"),function(){ startGame(); });', '  bindBtn($("againBtn"),MGS.paid(startGame));'),
+  # report the result to the site; fit the card
+  ('  resultScr.classList.add("show");',
+   '  resultScr.classList.add("show"); fitEnd();\n'
+   '  if(G.cents>0) MGS.win({ amount: G.cents/100, code: currentCode, label: fmt(G.cents) }); else MGS.gameOver();\n}\n'
+   'function fitEnd(){\n  modal.style.setProperty("--k",1);\n'
+   '  modal.style.setProperty("--k",Math.min(1,(H-24)/modal.offsetHeight,(W-16)/modal.offsetWidth).toFixed(3));'),
+  ('window.addEventListener("resize",resize);', 'window.addEventListener("resize",function(){ resize(); if(G && G.state==="result") fitEnd(); });'),
+  # skip the in-game start screen (paid on the site already); start sound on the Start tap; test hook
+  ('requestAnimationFrame(frame);\n\n})();',
+   'requestAnimationFrame(frame);\n/* MGS: skip in-game start screen */\nMGS.onAudioUnlock(initAudio);\nMGS.boot(startGame);\n'
+   'window.MGS_TEST = { S, startGame, strike, win, lose, showResult, fitEnd, toScreen, bodyCenter,\n'
+   '  get G(){ return G; }, get W(){ return W; }, get H(){ return H; } };\n})();'),
 ])
 
 # Fruit Slash: the mascot poses come from tools/fruit-slash-cats/*.webp (owner: new ninja panda, made in Magnific on a

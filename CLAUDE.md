@@ -68,9 +68,9 @@ README.md             Owner-facing guide in Chinese (adding games, API, claim pa
   The games' own start screens are skipped (BOOT block in patch_games.py).
 - Replay after a **win** or after a full **loss** is paid (`MGS.paid`).
   "Try again" while lives/chances remain inside the same game is free.
-- 18 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
+- 19 games: Chicken Cross, Croco Road, Catch the Fortune, Gold Rush Mines, Jungle Whack, Neon Rocket, Golden Goal,
   Pocket Pilot, Flash Memory, Stack Stack Win, Fruit Slash, Sword in the Stone, Ghost Hunt, Punch Rush, Rock N Run,
-  Walk the Plank, Planet Hop, Golden Eyes.
+  Walk the Plank, Planet Hop, Golden Eyes, Thunder Strike.
 - Pocket Pilot: 1 life, no hearts in the HUD; difficulty rises through the flight
   (gap, spacing, height swings and speed all tighten, eased so the start stays gentle).
 - Free mid-game restarts are hidden: Croco Road ↻ (`#replayHud`), Gold Rush "New dig" (`#newBtn`).
@@ -111,7 +111,7 @@ Do not treat the site as production-safe until these exist.
 1. Put the original HTML in `games_original_backup/` and a 1:1 thumbnail in `thumbs/`.
    Games often come from the owner's claude.ai artifacts (Artifact tool, `read`).
    If an artifact loads separate files (e.g. `assets/*.png`), embed them as data URIs into one
-   self-contained HTML before saving it as the original (done for Pocket Pilot, Rock N Run and Planet Hop).
+   self-contained HTML before saving it as the original (done for Pocket Pilot, Rock N Run, Planet Hop and Thunder Strike).
 2. In `tools/patch_games.py`, add a `patch(...)` entry. It must:
    - call `MGS.win` on win and `MGS.gameOver` on final loss
    - wrap replay buttons with `MGS.paid`
@@ -220,6 +220,12 @@ No test suite. Verify with Playwright (Chromium is preinstalled in the cloud ses
     `MGS_TEST.amount=2; MGS_TEST.victory()` = RM2.00 (card after ~3 s). GOLDEN EYES (`#skillBtn`) works once per game.
     Its claim URL and `target="_blank"` CLAIM link are removed; its 520px width cap is off. Result card scales to fit
     (`fitEnd`, CSS `scale: var(--k)` so its pop-in animation still runs).
+  - Thunder Strike: IIFE, exposes `window.MGS_TEST` (`G` is the game state). Click a monster's `MGS_TEST.bodyCenter(e)` for
+    `e` in `MGS_TEST.G.ents` (state `walk`, kind not `villager`) to zap it (+RM0.10, gold +RM0.20). 3 hearts: a monster reaching
+    the village or a zapped villager costs one. `MGS_TEST.G.cents=70; MGS_TEST.lose()` = RM0.70 voucher (card after ~1.1 s),
+    `cents=0; lose()` = loss, `G.cents=200; MGS_TEST.win()` = RM2.00 (card after ~2.9 s). Images were separate files in the
+    artifact and are embedded (`ASSETS` + CSS data URIs). The game's own CLAIM binding is removed (its touchend handler would
+    swallow the click the bridge needs). Result card scales to fit (`fitEnd`, CSS `scale: var(--k)`).
 - Games must **fill the whole frame** (owner asked: no empty bands left/right or top/bottom) and keep
   their controls visible on short phones. Games built as a fixed 9:16 stage need a patch:
   Pocket Pilot widens its world (`W` follows the screen shape, height stays 711);

@@ -394,5 +394,26 @@ window.GAMES = [
       "点错人或时间用完，游戏就结束。已赢的归你。",
       "找不到？每局可以用一次「GOLDEN EYES」火眼金睛，妖怪会发出金光。过完 20 关就是 RM2.00。"
     ]
+  },
+  {
+    id: "thunder-strike",
+    title: "Thunder Strike",
+    file: "games/thunder-strike.html",
+    thumb: "thumbs/thunder-strike.jpg?v=68",
+    cost: 1,
+    tag: "NEW",
+    color: "#5b21b6",
+    howTo: [
+      "Tap to strike lightning on the monsters before they reach the village. Each monster knocked out adds RM0.10, a golden monster RM0.20.",
+      "Don't zap the villagers walking among them — that costs a heart.",
+      "Knock out 5 in a row to charge the storm: your next strike chains to more monsters.",
+      "You have 3 hearts. Each monster that reaches the village costs one too. Lose them all and the game ends; you keep what you won. RM2.00 is the max."
+    ],
+    howTo_zh: [
+      "点屏幕放闪电，在怪兽走到村子前打倒它们。每打倒一只加 RM0.10，金色怪兽加 RM0.20。",
+      "别劈到混在里面的村民，劈到会少一颗心！",
+      "连续打倒 5 只会充满风暴能量，下一道闪电会连锁劈中更多怪兽。",
+      "共有 3 颗心，每有一只怪兽走进村子也会少一颗。心没了游戏结束，已赢的归你。最高 RM2.00。"
+    ]
   }
 ];
